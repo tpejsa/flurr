@@ -11,16 +11,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\include\flurr\flurr.h" />
-    <ClInclude Include="..\..\..\include\flurr\FlurrConfig.h" />
-    <ClInclude Include="..\..\..\include\flurr\FlurrCore.h" />
-    <ClInclude Include="..\..\..\include\flurr\FlurrDefines.h" />
-    <ClInclude Include="..\..\..\include\flurr\FlurrRenderer.h" />
+    <ClInclude Include="..\..\include\flurr\flurr.h" />
+    <ClInclude Include="..\..\include\flurr\FlurrConfig.h" />
+    <ClInclude Include="..\..\include\flurr\FlurrCore.h" />
+    <ClInclude Include="..\..\include\flurr\FlurrDefines.h" />
+    <ClInclude Include="..\..\include\flurr\FlurrRenderer.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\source\flurr\FlurrConfig.cpp" />
-    <ClCompile Include="..\..\..\source\flurr\FlurrCore.cpp" />
-    <ClCompile Include="..\..\..\source\flurr\FlurrRenderer.cpp" />
+    <ClCompile Include="..\..\source\flurr\FlurrConfig.cpp" />
+    <ClCompile Include="..\..\source\flurr\FlurrCore.cpp" />
+    <ClCompile Include="..\..\source\flurr\FlurrRenderer.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
