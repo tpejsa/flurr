@@ -1,30 +1,33 @@
 #pragma once
 
 #include "FlurrDefines.h"
-#include "FlurrConfig.h"
+#include "FlurrConfigFile.h"
 
 #include <string>
 
 namespace flurr {
 
-class FlurrCore {
+class FLURR_DLL_EXPORT FlurrCore {
 
-public:
+private:
 
   FlurrCore() = default;
-  ~FlurrCore() = default;
   FlurrCore(const FlurrCore&) = delete;
   FlurrCore(FlurrCore&&) = delete;
   FlurrCore& operator=(const FlurrCore&) = delete;
   FlurrCore& operator=(FlurrCore&&) = delete;
+  ~FlurrCore() = default;
+
+public:
 
   Status Init(const std::string& config_path = "flurr.cfg");
-  Status Shutdown();
+  void Shutdown();
   Status Update();
+
+  static FlurrCore& Get();
 
 private:
 
-  FlurrConfig config_;
 };
 
 } // namespace flurr

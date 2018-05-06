@@ -1,6 +1,14 @@
 bin/*
 *.exe
 *.dll
-*.vsproj
+*.lib
+*.exp
 .vs
-*.vcxproj.user
+*.obj
+*.log
+*.tlog
+*.pdb
+*.idb
+*.ilk
+*.user
+*.filters
