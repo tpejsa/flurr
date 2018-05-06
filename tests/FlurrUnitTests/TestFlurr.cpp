@@ -9,6 +9,9 @@ using flurr::TrimString;
 using flurr::SplitString;
 using flurr::FromString;
 using flurr::ToString;
+using flurr::ConfigFile;
+using flurr::Status;
+using flurr::FlurrCore;
 
 class FlurrTest : public ::testing::Test {
 
@@ -83,6 +86,42 @@ TEST_F(FlurrTest, FlurrStringUtils) {
   EXPECT_TRUE(FromString<int>("123") == 123);
   EXPECT_TRUE(FromString<double>(ToString(123.321)) == 123.321);
   EXPECT_TRUE(FromString<bool>(ToString(true)) == true);
+}
+
+// Test configuration file reader
+TEST_F(FlurrTest, FlurrConfigFile) {
+  // Can we read the config file?
+  ConfigFile cfg_file;
+  EXPECT_TRUE(cfg_file.ReadFromFile("TestFlurr.cfg") == Status::kSuccess);
+
+  // Verify config settings
+  int option_int = 0;
+  std::string option_str = "";
+  float option_float = 0.f;
+  bool option_bool = false;
+  std::string resource_dir = "";
+  bool log_enabled = true;
+  std::string renderer_type = "";
+  std::string texture_filtering = "";
+  int anisotropy_level = 0;
+  EXPECT_TRUE(cfg_file.ReadIntValue("", "optionInt", option_int) &&
+    123 == option_int);
+  EXPECT_TRUE(cfg_file.ReadStringValue("", "optionString", option_str) &&
+    "abc" == option_str);
+  EXPECT_TRUE(cfg_file.ReadFloatValue("", "optionFloat", option_float) &&
+    12.35f == option_float);
+  EXPECT_TRUE(cfg_file.ReadBoolValue("", "optionBool", option_bool) &&
+    true == option_bool);
+  EXPECT_TRUE(cfg_file.ReadStringValue("General", "resourceDirectory", resource_dir) &&
+    "./resources" == resource_dir);
+  EXPECT_TRUE(cfg_file.ReadBoolValue("General", "logEnabled", log_enabled) &&
+    false == log_enabled);
+  EXPECT_TRUE(cfg_file.ReadStringValue("Renderer", "rendererType", renderer_type) &&
+    "OGL3" == renderer_type);
+  EXPECT_TRUE(cfg_file.ReadStringValue("Renderer", "textureFiltering", texture_filtering) &&
+    "Anisotropic" == texture_filtering);
+  EXPECT_TRUE(cfg_file.ReadIntValue("Renderer", "anisotropyLevel", anisotropy_level) &&
+    16 == anisotropy_level);
 }
 
 int main(int argc, char **argv) {

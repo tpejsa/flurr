@@ -7,18 +7,18 @@
 
 #ifdef NDEBUG
 #define FLURR_LOG_DEBUG(msg, ...) \
-  FlurrLog::Get().LogDebug(__FILE__, __LINE__, msg FLURR_VA_OPT_COMMA __VA_ARGS__)
+  flurr::FlurrLog::Get().LogDebug(__FILE__, __LINE__, msg FLURR_VA_OPT_COMMA __VA_ARGS__)
 #else
 #define FLURR_LOG_DEBUG(msg, ...)
 #endif
 #define FLURR_LOG_ERROR(msg, ...) \
-  FlurrLog::Get().LogError(__FILE__, __LINE__, msg FLURR_VA_OPT_COMMA __VA_ARGS__)
+  flurr::FlurrLog::Get().LogError(__FILE__, __LINE__, msg FLURR_VA_OPT_COMMA __VA_ARGS__)
 #define FLURR_LOG_WARN(msg, ...) \
-  FlurrLog::Get().LogWarning(__FILE__, __LINE__, msg FLURR_VA_OPT_COMMA __VA_ARGS__)
+  flurr::FlurrLog::Get().LogWarning(__FILE__, __LINE__, msg FLURR_VA_OPT_COMMA __VA_ARGS__)
 #define FLURR_LOG_INFO(msg, ...) \
-  FlurrLog::Get().LogInfo(__FILE__, __LINE__, msg FLURR_VA_OPT_COMMA __VA_ARGS__)
+  flurr::FlurrLog::Get().LogInfo(__FILE__, __LINE__, msg FLURR_VA_OPT_COMMA __VA_ARGS__)
 #define FLURR_ASSERT(result, msg, ...) \
-  FlurrLog::Get().Assert(__FILE__, __LINE__, (result), msg FLURR_VA_OPT_COMMA __VA_ARGS__)
+  flurr::FlurrLog::Get().Assert(__FILE__, __LINE__, (result), msg FLURR_VA_OPT_COMMA __VA_ARGS__)
 
 namespace flurr {
 

@@ -70,6 +70,9 @@
       <ImportLibrary>$(SolutionDir)..\..\lib\$(Platform)\$(ConfigurationName)\$(TargetName).lib</ImportLibrary>
       <AdditionalLibraryDirectories>$(SolutionDir)..\..\lib\$(Platform)\$(ConfigurationName)\;$(GTEST_ROOT)msvc\2010\gtest\$(Platform)-$(ConfigurationName)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>copy /Y $(SolutionDir)..\..\tests\FlurrUnitTests\TestFlurr.cfg $(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -92,6 +95,9 @@
       <ImportLibrary>$(SolutionDir)..\..\lib\$(Platform)\$(ConfigurationName)\$(TargetName).lib</ImportLibrary>
       <AdditionalLibraryDirectories>$(SolutionDir)..\..\lib\$(Platform)\$(ConfigurationName)\;$(GTEST_ROOT)msvc\2010\gtest\$(Platform)-$(ConfigurationName)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>copy /Y $(SolutionDir)..\..\tests\FlurrUnitTests\TestFlurr.cfg $(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

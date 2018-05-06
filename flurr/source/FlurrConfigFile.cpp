@@ -11,7 +11,7 @@ namespace flurr {
 Status ConfigFile::ReadFromFile(const std::string& config_path) {
   // Open config file for read
   std::ifstream ifs(config_path);
-  if (!ifs.is_open()) {
+  if (!ifs.good()) {
     FLURR_LOG_ERROR("Failed to open config file %s!", config_path.c_str());
     return Status::kOpenFileError;
   }
@@ -23,7 +23,7 @@ Status ConfigFile::ReadFromFile(const std::string& config_path) {
   do {
     // Read a line from config file
     std::getline(ifs, line);
-    if (ifs.fail()) {
+    if (ifs.bad()) {
       FLURR_LOG_ERROR("Error reading config file %s!", config_path.c_str());
       return Status::kReadFileError;
     }
@@ -144,15 +144,20 @@ bool ConfigFile::ParseLine(const std::string& line) {
     }
     cur_category_ = category;
   } else {
+    // Read setting key and value
     auto&& line_tokens = SplitString(trimmed_line, '=');
     if (line_tokens.size() < 2) {
       FLURR_LOG_ERROR("Line %u: invalid config setting!", line_num_);
       return false;
     }
 
-    // Read config setting
-    values_by_category_[cur_category_][line_tokens[0]] =
-      trimmed_line.substr(trimmed_line.find_first_of('='));
+    // Get key and value strings
+    std::string key = TrimString(line_tokens[0]);
+    std::string value = TrimString(
+      trimmed_line.substr(trimmed_line.find_first_of('=') + 1));
+
+    // Store setting key-value pair
+    values_by_category_[cur_category_][key] = value;
   }
 
   return true;
