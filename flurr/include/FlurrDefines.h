@@ -20,16 +20,15 @@ namespace flurr {
 
 using Handle = uint32_t;
 
-enum Status {
+enum class Status : uint16_t {
   kSuccess,
   kInitFailed,
-  kShutdownFailed,
   kOpenFileError,
   kReadFileError
 };
 
-enum RendererType {
-  kOGL3
+enum class RendererType : uint8_t {
+  kOpenGL
 };
 
 } // namespace flurr

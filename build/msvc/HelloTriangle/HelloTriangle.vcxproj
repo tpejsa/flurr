@@ -11,38 +11,29 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\flurr\include\flurr.h" />
-    <ClInclude Include="..\..\..\flurr\include\FlurrConfigFile.h" />
-    <ClInclude Include="..\..\..\flurr\include\FlurrCore.h" />
-    <ClInclude Include="..\..\..\flurr\include\FlurrDefines.h" />
-    <ClInclude Include="..\..\..\flurr\include\FlurrLog.h" />
-    <ClInclude Include="..\..\..\flurr\include\renderer\FlurrRenderer.h" />
-    <ClInclude Include="..\..\..\flurr\include\utils\FlurrString.h" />
-    <ClInclude Include="..\..\..\flurr\include\utils\FlurrTime.h" />
-    <ClInclude Include="..\..\..\flurr\include\utils\FlurrTypeCasts.h" />
+    <ClCompile Include="..\..\..\samples\common\FlurrApplication.cpp" />
+    <ClCompile Include="..\..\..\samples\HelloTriangle\HelloTriangleApplication.cpp" />
+    <ClCompile Include="..\..\..\samples\HelloTriangle\HelloTriangleMain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\flurr\source\FlurrConfigFile.cpp" />
-    <ClCompile Include="..\..\..\flurr\source\FlurrCore.cpp" />
-    <ClCompile Include="..\..\..\flurr\source\FlurrLog.cpp" />
-    <ClCompile Include="..\..\..\flurr\source\utils\FlurrString.cpp" />
-    <ClCompile Include="..\..\..\flurr\source\utils\FlurrTime.cpp" />
+    <ClInclude Include="..\..\..\samples\common\FlurrApplication.h" />
+    <ClInclude Include="..\..\..\samples\HelloTriangle\HelloTriangleApplication.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{63340C04-996C-46E7-9303-090627CE2B00}</ProjectGuid>
+    <ProjectGuid>{95572FE2-0752-4CCE-A705-2111064FD89C}</ProjectGuid>
     <RootNamespace>flurr</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -61,13 +52,13 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(GLM);$(IncludePath)</IncludePath>
-    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <IncludePath>$(GLFW)include;$(GLEW)include;$(GLM);$(GTEST_ROOT)include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(GLFW)lib-vc2015;$(GLEW)lib\Release\x64;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(GLM);$(IncludePath)</IncludePath>
-    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <IncludePath>$(GLFW)include;$(GLEW)include;$(GLM);$(GTEST_ROOT)include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(GLFW)lib-vc2015;$(GLEW)lib\Release\x64;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -76,15 +67,16 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ExceptionHandling>false</ExceptionHandling>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\flurr\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\flurr\include;$(SolutionDir)..\..\samples\common;$(SolutionDir)..\..\samples\$(ProjectName)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <OutputFile>$(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32.lib;flurr.lib;gtestd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary>$(SolutionDir)..\..\lib\$(Platform)\$(ConfigurationName)\$(TargetName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\lib\$(Platform)\$(ConfigurationName)\;$(GTEST_ROOT)msvc\2010\gtest\$(Platform)-$(ConfigurationName)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -95,7 +87,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ExceptionHandling>false</ExceptionHandling>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\flurr\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\flurr\include;$(SolutionDir)..\..\samples\common;$(SolutionDir)..\..\samples\$(ProjectName)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -104,8 +96,9 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <OutputFile>$(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32.lib;flurr.lib;gtest.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary>$(SolutionDir)..\..\lib\$(Platform)\$(ConfigurationName)\$(TargetName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\lib\$(Platform)\$(ConfigurationName)\;$(GTEST_ROOT)msvc\2010\gtest\$(Platform)-$(ConfigurationName)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

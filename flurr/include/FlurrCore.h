@@ -11,23 +11,24 @@ class FLURR_DLL_EXPORT FlurrCore {
 
 private:
 
-  FlurrCore() = default;
+  FlurrCore();
   FlurrCore(const FlurrCore&) = delete;
   FlurrCore(FlurrCore&&) = delete;
   FlurrCore& operator=(const FlurrCore&) = delete;
   FlurrCore& operator=(FlurrCore&&) = delete;
-  ~FlurrCore() = default;
+  ~FlurrCore();
 
 public:
 
   Status Init(const std::string& config_path = "flurr.cfg");
   void Shutdown();
-  Status Update();
+  Status Update(float delta_time);
 
   static FlurrCore& Get();
 
 private:
 
+  bool initialized_;
 };
 
 } // namespace flurr

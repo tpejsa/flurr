@@ -2,8 +2,11 @@
 
 #include "FlurrDefines.h"
 
+#include <atomic>
 #include <cstdarg>
 #include <cstdio>
+#include <mutex>
+#include <thread>
 
 #ifdef NDEBUG
 #define FLURR_LOG_DEBUG(msg, ...) \
@@ -36,21 +39,32 @@ private:
 public:
 
   #ifdef NDEBUG
-  bool LogDebug(const char* filename, int line, const char* msg, ...);
+  bool LogDebug(const char* file_path, int line, const char* msg, ...);
   #endif
-  bool LogError(const char* filename, int line, const char* msg, ...);
-  bool LogWarning(const char* filename, int line, const char* msg, ...);
-  bool LogInfo(const char* filename, int line, const char* msg, ...);
-  void Assert(const char* filename, int line, bool result, const char* msg, ...);
+  bool LogError(const char* file_path, int line, const char* msg, ...);
+  bool LogWarning(const char* file_path, int line, const char* msg, ...);
+  bool LogInfo(const char* file_path, int line, const char* msg, ...);
+  void Assert(const char* file_path, int line, bool result, const char* msg, ...);
   static FlurrLog& Get();
 
 private:
 
-  bool Log(const char* filename, int line, const char* msg_type, const char* msg, va_list args);
+  bool Log(const char* file_path, int line, const char* msg_type, const char* msg, va_list args);
+  void WriteToFile();
 
   static constexpr int kMaxLineSize = 4096;
-  std::FILE* log_file_;
-  char log_line_[kMaxLineSize];
+  static constexpr int kMsgBufferSize = 1024;
+
+  char msg_buffer_[kMsgBufferSize][kMaxLineSize];
+  char msg_temp_[kMaxLineSize];
+  std::atomic<int> log_line_; // next line to write into buffer
+  std::atomic<int> file_write_line_; // next line to write to file
+  FILE* log_file_;
+  int num_dropped_msgs_;
+
+  std::thread file_write_thread_;
+  std::mutex log_mutex_;
+
 };
 
 } // namespace flurr

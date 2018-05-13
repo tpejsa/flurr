@@ -48,10 +48,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(GLFW)include;$(GLEW)include;$(GLM);$(GTEST_ROOT)include;$(IncludePath)</IncludePath>
     <LibraryPath>$(GLFW)lib-vc2015;$(GLEW)lib\Release\x64;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(GLFW)include;$(GLEW)include;$(GLM);$(GTEST_ROOT)include;$(IncludePath)</IncludePath>
     <LibraryPath>$(GLFW)lib-vc2015;$(GLEW)lib\Release\x64;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
