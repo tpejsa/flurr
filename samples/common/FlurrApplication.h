@@ -1,4 +1,6 @@
 #pragma once
+#include "flurr.h"
+#include "flogger.h"
 #include <GLFW/glfw3.h>
 
 #include <string>
@@ -26,9 +28,14 @@ public:
 
 private:
 
+  // Application-specific callbacks:
   virtual bool OnInit() = 0;
   virtual bool OnUpdate(float delta_time) = 0;
   virtual void OnQuit() = 0;
+  virtual void OnWindowResize() {}
+
+  // GLFW callbacks:
+  static void glfwFramebufferSizeCallback(GLFWwindow* window, int width, int height);
 
   // Application window
   int window_width_;

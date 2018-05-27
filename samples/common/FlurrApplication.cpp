@@ -1,5 +1,4 @@
 #include "FlurrApplication.h"
-#include "flurr.h"
 
 #include <chrono>
 #include <iostream>
@@ -39,6 +38,7 @@ int FlurrApplication::Run() {
   FLURR_LOG_INFO("Initializing application...");
 
   // Initialize GLFW
+  FLURR_LOG_INFO("Initializing GLFW...");
   if (!glfwInit()) {
     FLURR_LOG_ERROR("Failed to initialize GLFW!");
     return -1;
@@ -56,10 +56,13 @@ int FlurrApplication::Run() {
   if (!window_) {
     FLURR_LOG_ERROR("Failed to create application window!");
     glfwTerminate();
-
     return -1;
   }
   glfwMakeContextCurrent(window_);
+
+  // Associate pointer to this FlurrApplication with the window
+  // (needed in GLFW callbacks, which cannot be member functions)
+  glfwSetWindowUserPointer(window_, this);
 
   // Initialize flurr
   FLURR_LOG_INFO("Initializing flurr...");
@@ -68,13 +71,22 @@ int FlurrApplication::Run() {
   if (flurr_status != Status::kSuccess) {
     FLURR_LOG_ERROR("flurr initialization failed (error: %u)!", FromEnum(flurr_status));
     glfwTerminate();
-
     return -1;
   }
-  glfwMakeContextCurrent(window_);
 
   // Initialize flurr renderer
-  // TODO: initialize flurr renderer
+  FLURR_LOG_INFO("Initializing flurr renderer...");
+  auto& flurr_renderer = FlurrOGLRenderer::Get();
+  flurr_status = flurr_renderer.Init();
+  if (flurr_status != Status::kSuccess) {
+    FLURR_LOG_ERROR("flurr renderer initialization failed (error: %u)!", FromEnum(flurr_status));
+    flurr_core.Shutdown();
+    glfwTerminate();
+    return -1;
+  }
+
+  // Register window resize callback
+  glfwSetFramebufferSizeCallback(window_, glfwFramebufferSizeCallback);
 
   // Application-specific initialization
   FLURR_LOG_INFO("Application-specific initialization...");
@@ -82,7 +94,6 @@ int FlurrApplication::Run() {
     FLURR_LOG_ERROR("Application initialization failed!");
     flurr_core.Shutdown();
     glfwTerminate();
-
     return -1;
   }
 
@@ -92,6 +103,7 @@ int FlurrApplication::Run() {
   // Update loop
   bool shutdown = false;
   int result = 0;
+  FLURR_LOG_INFO("Starting update loop...");
   while (!shutdown_) {
     // Compute delta time
     auto time_current = std::chrono::high_resolution_clock::now();
@@ -137,6 +149,20 @@ int FlurrApplication::Run() {
 
 void FlurrApplication::Quit() {
   shutdown_ = true;
+}
+
+void FlurrApplication::glfwFramebufferSizeCallback(GLFWwindow* window, int width, int height) {
+  auto* app = static_cast<FlurrApplication*>(glfwGetWindowUserPointer(window));
+  FLURR_ASSERT(app, "GLFW window user pointer must be to owning FlurrApplication!");
+
+  // Update renderer viewport size
+  auto* renderer = FlurrCore::Get().GetRenderer();
+  renderer->SetViewport(0, 0, width, height);
+
+  // Update application window size
+  app->window_width_ = width;
+  app->window_height_ = height;
+  app->OnWindowResize();
 }
 
 } // namespace flurr

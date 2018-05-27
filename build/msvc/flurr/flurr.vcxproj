@@ -25,6 +25,7 @@
     <ClCompile Include="..\..\..\flurr\source\FlurrConfigFile.cpp" />
     <ClCompile Include="..\..\..\flurr\source\FlurrCore.cpp" />
     <ClCompile Include="..\..\..\flurr\source\FlurrLog.cpp" />
+    <ClCompile Include="..\..\..\flurr\source\renderer\FlurrRenderer.cpp" />
     <ClCompile Include="..\..\..\flurr\source\utils\FlurrString.cpp" />
     <ClCompile Include="..\..\..\flurr\source\utils\FlurrTime.cpp" />
   </ItemGroup>

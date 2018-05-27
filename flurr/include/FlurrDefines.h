@@ -21,10 +21,11 @@ namespace flurr {
 using Handle = uint32_t;
 
 enum class Status : uint16_t {
-  kSuccess,
+  kSuccess = 0,
   kInitFailed,
   kOpenFileError,
-  kReadFileError
+  kReadFileError,
+  kNotInitialized
 };
 
 enum class RendererType : uint8_t {

@@ -1,4 +1,5 @@
 #include "FlurrCore.h"
+#include "FlurrConfigFile.h"
 #include "FlurrLog.h"
 
 namespace flurr {
@@ -27,12 +28,36 @@ void FlurrCore::Shutdown() {
     return;
   }
 
+  if (renderer_) {
+    if (renderer_->IsInitialized())
+      renderer_->Shutdown();
+    renderer_ = nullptr;
+  }
+
   initialized_ = false;
   FLURR_LOG_INFO("flurr shutdown complete.");
 }
 
 Status FlurrCore::Update(float delta_time) {
-  return Status::kSuccess;
+  Status result = Status::kSuccess;
+  if (renderer_) {
+    if (!renderer_->IsInitialized()) {
+      FLURR_LOG_ERROR("Failed to update flurr; renderer not initialized!");
+      return Status::kNotInitialized;
+    }
+
+    result = renderer_->Update(delta_time);
+  }
+
+  return result;
+}
+
+void FlurrCore::SetRenderer(FlurrRenderer* renderer) {
+  if (renderer)
+    FLURR_LOG_INFO("flurr renderer set.");
+  else
+    FLURR_LOG_INFO("flurr renderer unset.");
+  renderer_ = renderer;
 }
 
 FlurrCore& FlurrCore::Get() {
