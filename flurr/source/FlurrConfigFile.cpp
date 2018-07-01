@@ -1,5 +1,3 @@
-#pragma once
-
 #include "FlurrConfigFile.h"
 #include "FlurrLog.h"
 #include "utils/FlurrString.h"

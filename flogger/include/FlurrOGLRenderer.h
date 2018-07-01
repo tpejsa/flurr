@@ -25,6 +25,9 @@ private:
   Status OnInit() override;
   void OnShutdown() override;
   Status OnUpdate(float delta_time) override;
+
+  ShaderProgram* OnCreateShaderProgram(ShaderProgramHandle program_handle) override;
+  Status OnUseShaderProgram(ShaderProgram* program) override;
 };
 
 } // namespace flurr

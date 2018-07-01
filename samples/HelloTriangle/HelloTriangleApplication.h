@@ -14,6 +14,11 @@ private:
   bool OnInit() override;
   bool OnUpdate(float delta_time) override;
   void OnQuit() override;
+
+  static constexpr const char kVertexShaderPath[] = "resources/shaders/VertexColored.vert";
+  static constexpr const char kFragmentShaderPath[] = "resources/shaders/VertexColored.frag";
+
+  ShaderProgramHandle shader_program_handle_;
 };
 
 } // namespace flurr

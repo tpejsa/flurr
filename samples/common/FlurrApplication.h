@@ -28,14 +28,19 @@ public:
 
 private:
 
+  void UpdateCamera();
+
   // Application-specific callbacks:
   virtual bool OnInit() = 0;
   virtual bool OnUpdate(float delta_time) = 0;
   virtual void OnQuit() = 0;
   virtual void OnWindowResize() {}
+  virtual void OnKeyDown(int key);
+  virtual void OnKeyUp(int key);
 
   // GLFW callbacks:
   static void glfwFramebufferSizeCallback(GLFWwindow* window, int width, int height);
+  static void glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
   // Application window
   int window_width_;

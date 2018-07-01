@@ -17,6 +17,9 @@
     <ClInclude Include="..\..\..\flurr\include\FlurrDefines.h" />
     <ClInclude Include="..\..\..\flurr\include\FlurrLog.h" />
     <ClInclude Include="..\..\..\flurr\include\renderer\FlurrRenderer.h" />
+    <ClInclude Include="..\..\..\flurr\include\renderer\FlurrShader.h" />
+    <ClInclude Include="..\..\..\flurr\include\renderer\FlurrShaderProgram.h" />
+    <ClInclude Include="..\..\..\flurr\include\utils\FlurrObjectFactory.h" />
     <ClInclude Include="..\..\..\flurr\include\utils\FlurrString.h" />
     <ClInclude Include="..\..\..\flurr\include\utils\FlurrTime.h" />
     <ClInclude Include="..\..\..\flurr\include\utils\FlurrTypeCasts.h" />
@@ -26,6 +29,8 @@
     <ClCompile Include="..\..\..\flurr\source\FlurrCore.cpp" />
     <ClCompile Include="..\..\..\flurr\source\FlurrLog.cpp" />
     <ClCompile Include="..\..\..\flurr\source\renderer\FlurrRenderer.cpp" />
+    <ClCompile Include="..\..\..\flurr\source\renderer\FlurrShader.cpp" />
+    <ClCompile Include="..\..\..\flurr\source\renderer\FlurrShaderProgram.cpp" />
     <ClCompile Include="..\..\..\flurr\source\utils\FlurrString.cpp" />
     <ClCompile Include="..\..\..\flurr\source\utils\FlurrTime.cpp" />
   </ItemGroup>
@@ -81,6 +86,7 @@
       <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <OutputFile>$(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\$(TargetName)$(TargetExt)</OutputFile>
@@ -100,6 +106,7 @@
       <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

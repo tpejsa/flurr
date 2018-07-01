@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <glm/glm.hpp>
 
 // Shared library export
 #ifdef _MSC_VER
@@ -18,18 +19,26 @@
 
 namespace flurr {
 
-using Handle = uint32_t;
+// flurr handles
+using ShaderProgramHandle = uint32_t;
 
+// flurr handle constants
+constexpr ShaderProgramHandle INVALID_SHADER_PROGRAM = 0;
+
+// flurr status codes
 enum class Status : uint16_t {
   kSuccess = 0,
+  kFailed,
   kInitFailed,
   kOpenFileError,
   kReadFileError,
-  kNotInitialized
-};
-
-enum class RendererType : uint8_t {
-  kOpenGL
+  kNotInitialized,
+  kNoObjectWithHandle,
+  kUnsupportedType,
+  kUnsupportedMode,
+  kCompilationFailed,
+  kLinkingFailed,
+  kInvalidState
 };
 
 } // namespace flurr

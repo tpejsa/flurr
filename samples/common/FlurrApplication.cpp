@@ -85,8 +85,9 @@ int FlurrApplication::Run() {
     return -1;
   }
 
-  // Register window resize callback
+  // Register GLFW callbacks
   glfwSetFramebufferSizeCallback(window_, glfwFramebufferSizeCallback);
+  glfwSetKeyCallback(window_, glfwKeyCallback);
 
   // Application-specific initialization
   FLURR_LOG_INFO("Application-specific initialization...");
@@ -148,12 +149,32 @@ int FlurrApplication::Run() {
 }
 
 void FlurrApplication::Quit() {
+  FLURR_LOG_INFO("Quitting application...");
   shutdown_ = true;
+}
+
+void FlurrApplication::UpdateCamera() {
+  // TODO: update camera position and orientation based on user input
+}
+
+void FlurrApplication::OnKeyDown(int key) {
+  switch (key) {
+    case GLFW_KEY_ESCAPE: {
+      Quit();
+      break;
+    }
+    default: {
+      break;
+    }
+  }
+}
+
+void FlurrApplication::OnKeyUp(int key) {
 }
 
 void FlurrApplication::glfwFramebufferSizeCallback(GLFWwindow* window, int width, int height) {
   auto* app = static_cast<FlurrApplication*>(glfwGetWindowUserPointer(window));
-  FLURR_ASSERT(app, "GLFW window user pointer must be to owning FlurrApplication!");
+  FLURR_ASSERT(app, "GLFW window user pointer must be set to owning FlurrApplication!");
 
   // Update renderer viewport size
   auto* renderer = FlurrCore::Get().GetRenderer();
@@ -163,6 +184,20 @@ void FlurrApplication::glfwFramebufferSizeCallback(GLFWwindow* window, int width
   app->window_width_ = width;
   app->window_height_ = height;
   app->OnWindowResize();
+}
+
+void FlurrApplication::glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+  auto* app = static_cast<FlurrApplication*>(glfwGetWindowUserPointer(window));
+  FLURR_ASSERT(app, "GLFW window user pointer must be set to owning FlurrApplication!");
+
+  if (!mods) {
+    if (GLFW_PRESS == action) {
+      app->OnKeyDown(key);
+    }
+    else if (GLFW_RELEASE == action) {
+      app->OnKeyUp(key);
+    }
+  }
 }
 
 } // namespace flurr

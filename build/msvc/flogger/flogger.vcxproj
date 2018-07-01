@@ -13,9 +13,19 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\flogger\include\flogger.h" />
     <ClInclude Include="..\..\..\flogger\include\FlurrOGLRenderer.h" />
+    <ClInclude Include="..\..\..\flogger\include\FlurrOGLShader.h" />
+    <ClInclude Include="..\..\..\flogger\include\FlurrOGLShaderProgram.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\flogger\source\FlurrOGLRenderer.cpp" />
+    <ClCompile Include="..\..\..\flogger\source\FlurrOGLShader.cpp" />
+    <ClCompile Include="..\..\..\flogger\source\FlurrOGLShaderProgram.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\flogger\resources\shaders\LitPhong.frag" />
+    <None Include="..\..\..\flogger\resources\shaders\LitPhong.vert" />
+    <None Include="..\..\..\flogger\resources\shaders\VertexColored.frag" />
+    <None Include="..\..\..\flogger\resources\shaders\VertexColored.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -69,6 +79,7 @@
       <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <OutputFile>$(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\$(TargetName)$(TargetExt)</OutputFile>
@@ -76,6 +87,11 @@
       <ImportLibrary>$(SolutionDir)..\..\lib\$(Platform)\$(ConfigurationName)\$(TargetName).lib</ImportLibrary>
       <AdditionalLibraryDirectories>$(SolutionDir)..\..\lib\$(Platform)\$(ConfigurationName)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>rd /s /q $(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\resources\shaders
+md $(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\resources\shaders
+copy /Y $(SolutionDir)..\..\flogger\resources\shaders\*.* $(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\resources\shaders</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -89,6 +105,7 @@
       <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -98,6 +115,11 @@
       <ImportLibrary>$(SolutionDir)..\..\lib\$(Platform)\$(ConfigurationName)\$(TargetName).lib</ImportLibrary>
       <AdditionalLibraryDirectories>$(SolutionDir)..\..\lib\$(Platform)\$(ConfigurationName)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>rd /s /q $(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\resources\shaders
+md $(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\resources\shaders
+copy /Y $(SolutionDir)..\..\flogger\resources\shaders\*.* $(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\resources\shaders</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

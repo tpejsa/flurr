@@ -2,6 +2,7 @@
 #include <flurr.h>
 
 #include <cstdio>
+#include <memory>
 #include <thread>
 
 using flurr::CurrentTime;
@@ -11,6 +12,7 @@ using flurr::FromString;
 using flurr::ToString;
 using flurr::ConfigFile;
 using flurr::Status;
+using flurr::ObjectFactory;
 using flurr::FlurrCore;
 
 class FlurrTest : public ::testing::Test {
@@ -122,6 +124,81 @@ TEST_F(FlurrTest, FlurrConfigFile) {
     "Anisotropic" == texture_filtering);
   EXPECT_TRUE(cfg_file.ReadIntValue("Renderer", "anisotropyLevel", anisotropy_level) &&
     16 == anisotropy_level);
+}
+
+enum class TestObjectType {
+  kTest1 = 0,
+  kTest2,
+  kTestInvalid
+};
+
+class BaseTestObject {
+public:
+  BaseTestObject(uint32_t obj_id, const std::string& obj_name)
+    : object_id_(obj_id), object_name_(obj_name) {
+  }
+  uint32_t ObjectId() const { return object_id_; }
+  const std::string& ObjectName() const { return object_name_; }
+  virtual TestObjectType TypeId() const = 0;
+private:
+  uint32_t object_id_;
+  std::string object_name_;
+};
+
+class Test1Object : public BaseTestObject {
+public:
+  Test1Object(uint32_t obj_id, const std::string& obj_name)
+    : BaseTestObject(obj_id, obj_name) {
+  }
+  TestObjectType TypeId() const override { return TestObjectType::kTest1; }
+};
+
+class Test2Object : public BaseTestObject {
+public:
+  Test2Object(uint32_t obj_id, const std::string& obj_name)
+    : BaseTestObject(obj_id, obj_name) {
+  }
+  TestObjectType TypeId() const override { return TestObjectType::kTest2; }
+};
+
+// Test object factory
+TEST_F(FlurrTest, FlurrObjectFactories) {
+  using TestObjectFactory = ObjectFactory<BaseTestObject, TestObjectType, TestObjectType::kTestInvalid, uint32_t, std::string>;
+  TestObjectFactory test_obj_factory;
+  EXPECT_TRUE(TestObjectFactory::kInvalidTypeId == TestObjectType::kTestInvalid);
+
+  // Test class registration
+  TestObjectFactory::CreateCallbackType test1_obj_create_callback =
+    [](uint32_t obj_id, const std::string& obj_name) {
+      return new Test1Object(obj_id, obj_name);
+    };
+  TestObjectFactory::CreateCallbackType test2_obj_create_callback =
+    [](uint32_t obj_id, const std::string& obj_name) {
+      return new Test2Object(obj_id, obj_name);
+    };
+  test_obj_factory.RegisterClass(TestObjectType::kTest1, "Test1Object", test1_obj_create_callback);
+  test_obj_factory.RegisterClass(TestObjectType::kTest2, "Test2Object", test2_obj_create_callback);
+  EXPECT_TRUE(test_obj_factory.IsClassRegistered(TestObjectType::kTest1));
+  EXPECT_TRUE(test_obj_factory.IsClassRegistered(TestObjectType::kTest2));
+  EXPECT_TRUE(test_obj_factory.IsClassRegistered("Test1Object"));
+  EXPECT_TRUE(test_obj_factory.IsClassRegistered("Test2Object"));
+  EXPECT_TRUE(test_obj_factory.GetTypeIdByName("Test1Object") == TestObjectType::kTest1);
+  EXPECT_TRUE(test_obj_factory.GetTypeIdByName("Test2Object") == TestObjectType::kTest2);
+  EXPECT_TRUE(test_obj_factory.GetTypeIdByName("Test3Object") == TestObjectFactory::kInvalidTypeId);
+  const auto& test_obj_types = test_obj_factory.GetRegisteredClassTypes();
+  ASSERT_TRUE(test_obj_types.size() == 2);
+
+  // Test object creation
+  auto&& test1_obj1 = std::unique_ptr<BaseTestObject>(test_obj_factory.CreateObject(TestObjectType::kTest1, 1, "Test1Obj1"));
+  auto&& test1_obj2 = std::unique_ptr<BaseTestObject>(test_obj_factory.CreateObject("Test1Object", 2, "Test1Obj2"));
+  auto&& test2_obj3 = std::unique_ptr<BaseTestObject>(test_obj_factory.CreateObject(TestObjectType::kTest2, 3, "Test2Obj3"));
+  ASSERT_TRUE(test1_obj1);
+  ASSERT_TRUE(test1_obj2);
+  ASSERT_TRUE(test2_obj3);
+  EXPECT_TRUE(test1_obj1->TypeId() == TestObjectType::kTest1);
+  EXPECT_TRUE(test2_obj3->TypeId() == TestObjectType::kTest2);
+  EXPECT_TRUE(test1_obj1->ObjectId() == 1);
+  EXPECT_TRUE(test2_obj3->ObjectId() == 3);
 }
 
 int main(int argc, char **argv) {
