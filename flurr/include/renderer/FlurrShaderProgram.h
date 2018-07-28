@@ -34,12 +34,14 @@ public:
   inline const std::vector<Shader*>& GetAllShaders() const { return shaders_; }
   virtual Status LinkProgram();
   virtual void DeleteProgram();
+  virtual void UseProgram();
 
 private:
 
   virtual Shader* OnCreateShader(ShaderType shader_type, ShaderProgram* owning_program) = 0;
   virtual Status OnLinkProgram() = 0;
   virtual void OnDeleteProgram() = 0;
+  virtual void OnUseProgram() = 0;
 
   ShaderProgramHandle program_handle_;
   ShaderProgramState program_state_;

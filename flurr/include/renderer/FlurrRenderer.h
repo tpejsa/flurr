@@ -46,7 +46,6 @@ private:
   virtual Status OnUpdate(float delta_time) = 0;
 
   virtual ShaderProgram* OnCreateShaderProgram(ShaderProgramHandle program_handle) = 0;
-  virtual Status OnUseShaderProgram(ShaderProgram* program) = 0;
 
   bool initialized_;
 

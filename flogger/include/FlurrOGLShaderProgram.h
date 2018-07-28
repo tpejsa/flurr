@@ -21,6 +21,7 @@ private:
   Shader* OnCreateShader(ShaderType shader_type, ShaderProgram* owning_program) override;
   Status OnLinkProgram() override;
   void OnDeleteProgram() override;
+  void OnUseProgram() override;
 
   GLuint ogl_program_id_;
 };

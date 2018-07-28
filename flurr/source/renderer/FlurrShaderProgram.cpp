@@ -61,4 +61,8 @@ void ShaderProgram::DeleteProgram() {
   program_state_ = ShaderProgramState::kDeleting;
 }
 
+void ShaderProgram::UseProgram() {
+  OnUseProgram();
+}
+
 } // namespace flurr

@@ -21,15 +21,18 @@ namespace flurr {
 
 // flurr handles
 using ShaderProgramHandle = uint32_t;
+using VertexArrayHandle = uint32_t;
 
 // flurr handle constants
 constexpr ShaderProgramHandle INVALID_SHADER_PROGRAM = 0;
+constexpr VertexArrayHandle INVALID_VERTEX_ARRAY = 0;
 
 // flurr status codes
 enum class Status : uint16_t {
   kSuccess = 0,
   kFailed,
-  kInitFailed,
+  kNullArgument,
+  kInvalidArgument,
   kOpenFileError,
   kReadFileError,
   kNotInitialized,

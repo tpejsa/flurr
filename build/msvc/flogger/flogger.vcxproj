@@ -15,11 +15,15 @@
     <ClInclude Include="..\..\..\flogger\include\FlurrOGLRenderer.h" />
     <ClInclude Include="..\..\..\flogger\include\FlurrOGLShader.h" />
     <ClInclude Include="..\..\..\flogger\include\FlurrOGLShaderProgram.h" />
+    <ClInclude Include="..\..\..\flogger\include\FlurrOGLVertexArray.h" />
+    <ClInclude Include="..\..\..\flogger\include\FlurrOGLVertexBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\flogger\source\FlurrOGLRenderer.cpp" />
     <ClCompile Include="..\..\..\flogger\source\FlurrOGLShader.cpp" />
     <ClCompile Include="..\..\..\flogger\source\FlurrOGLShaderProgram.cpp" />
+    <ClCompile Include="..\..\..\flogger\source\FlurrOGLVertexArray.cpp" />
+    <ClCompile Include="..\..\..\flogger\source\FlurrOGLVertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\flogger\resources\shaders\LitPhong.frag" />

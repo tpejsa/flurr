@@ -19,6 +19,8 @@
     <ClInclude Include="..\..\..\flurr\include\renderer\FlurrRenderer.h" />
     <ClInclude Include="..\..\..\flurr\include\renderer\FlurrShader.h" />
     <ClInclude Include="..\..\..\flurr\include\renderer\FlurrShaderProgram.h" />
+    <ClInclude Include="..\..\..\flurr\include\renderer\FlurrVertexArray.h" />
+    <ClInclude Include="..\..\..\flurr\include\renderer\FlurrVertexBuffer.h" />
     <ClInclude Include="..\..\..\flurr\include\utils\FlurrObjectFactory.h" />
     <ClInclude Include="..\..\..\flurr\include\utils\FlurrString.h" />
     <ClInclude Include="..\..\..\flurr\include\utils\FlurrTime.h" />
@@ -31,6 +33,8 @@
     <ClCompile Include="..\..\..\flurr\source\renderer\FlurrRenderer.cpp" />
     <ClCompile Include="..\..\..\flurr\source\renderer\FlurrShader.cpp" />
     <ClCompile Include="..\..\..\flurr\source\renderer\FlurrShaderProgram.cpp" />
+    <ClCompile Include="..\..\..\flurr\source\renderer\FlurrVertexArray.cpp" />
+    <ClCompile Include="..\..\..\flurr\source\renderer\FlurrVertexBuffer.cpp" />
     <ClCompile Include="..\..\..\flurr\source\utils\FlurrString.cpp" />
     <ClCompile Include="..\..\..\flurr\source\utils\FlurrTime.cpp" />
   </ItemGroup>

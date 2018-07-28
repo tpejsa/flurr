@@ -55,4 +55,8 @@ void OGLShaderProgram::OnDeleteProgram() {
     shader->Delete();
 }
 
+void OGLShaderProgram::OnUseProgram() {
+  glUseProgram(ogl_program_id_);
+}
+
 } // namespace flurr

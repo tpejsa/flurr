@@ -42,10 +42,4 @@ ShaderProgram* FlurrOGLRenderer::OnCreateShaderProgram(ShaderProgramHandle progr
   return new OGLShaderProgram(program_handle);
 }
 
-Status FlurrOGLRenderer::OnUseShaderProgram(ShaderProgram* program) {
-  GLuint ogl_program_id = static_cast<OGLShaderProgram*>(program)->GetOGLProgramId();
-  glUseProgram(ogl_program_id);
-  return Status::kSuccess;
-}
-
 } // namespace flurr

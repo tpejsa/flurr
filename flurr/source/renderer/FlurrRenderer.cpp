@@ -20,11 +20,13 @@ Status FlurrRenderer::Init(const std::string& config_path) {
 
   if (!FlurrCore::Get().IsInitialized()) {
     FLURR_LOG_ERROR("Failed to initialize flurr renderer; flurr core not initialized!");
-    return Status::kInitFailed;
+    return Status::kNotInitialized;
   }
 
+  // Make sure this renderer is set in FlurrCore
   FlurrCore::Get().SetRenderer(this);
 
+  // Initialize renderer
   Status result = OnInit();
   if (Status::kSuccess != result) {
     FLURR_LOG_ERROR("Failed to initialize flurr renderer!");
@@ -141,7 +143,7 @@ Status FlurrRenderer::UseShaderProgram(ShaderProgramHandle program_handle) {
     return Status::kInvalidState;
   }
 
-  return OnUseShaderProgram(shader_program);
+  shader_program->UseProgram();
 }
 
 } // namespace flurr
