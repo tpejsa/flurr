@@ -12,31 +12,31 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\flurr\include\flurr.h" />
-    <ClInclude Include="..\..\..\flurr\include\FlurrConfigFile.h" />
-    <ClInclude Include="..\..\..\flurr\include\FlurrCore.h" />
-    <ClInclude Include="..\..\..\flurr\include\FlurrDefines.h" />
-    <ClInclude Include="..\..\..\flurr\include\FlurrLog.h" />
-    <ClInclude Include="..\..\..\flurr\include\renderer\FlurrRenderer.h" />
-    <ClInclude Include="..\..\..\flurr\include\renderer\FlurrShader.h" />
-    <ClInclude Include="..\..\..\flurr\include\renderer\FlurrShaderProgram.h" />
-    <ClInclude Include="..\..\..\flurr\include\renderer\FlurrVertexArray.h" />
-    <ClInclude Include="..\..\..\flurr\include\renderer\FlurrVertexBuffer.h" />
-    <ClInclude Include="..\..\..\flurr\include\utils\FlurrObjectFactory.h" />
-    <ClInclude Include="..\..\..\flurr\include\utils\FlurrString.h" />
-    <ClInclude Include="..\..\..\flurr\include\utils\FlurrTime.h" />
-    <ClInclude Include="..\..\..\flurr\include\utils\FlurrTypeCasts.h" />
+    <ClInclude Include="..\..\..\flurr\include\flurr\renderer\ShaderProgram.h" />
+    <ClInclude Include="..\..\..\flurr\include\flurr\utils\ConfigFile.h" />
+    <ClInclude Include="..\..\..\flurr\include\flurr\FlurrCore.h" />
+    <ClInclude Include="..\..\..\flurr\include\flurr\FlurrDefines.h" />
+    <ClInclude Include="..\..\..\flurr\include\flurr\FlurrLog.h" />
+    <ClInclude Include="..\..\..\flurr\include\flurr\renderer\Renderer.h" />
+    <ClInclude Include="..\..\..\flurr\include\flurr\renderer\Shader.h" />
+    <ClInclude Include="..\..\..\flurr\include\flurr\renderer\VertexArray.h" />
+    <ClInclude Include="..\..\..\flurr\include\flurr\renderer\VertexBuffer.h" />
+    <ClInclude Include="..\..\..\flurr\include\flurr\utils\ObjectFactory.h" />
+    <ClInclude Include="..\..\..\flurr\include\flurr\utils\StringUtils.h" />
+    <ClInclude Include="..\..\..\flurr\include\flurr\utils\TimeUtils.h" />
+    <ClInclude Include="..\..\..\flurr\include\flurr\utils\TypeCasts.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\flurr\source\FlurrConfigFile.cpp" />
+    <ClCompile Include="..\..\..\flurr\source\utils\ConfigFile.cpp" />
     <ClCompile Include="..\..\..\flurr\source\FlurrCore.cpp" />
     <ClCompile Include="..\..\..\flurr\source\FlurrLog.cpp" />
-    <ClCompile Include="..\..\..\flurr\source\renderer\FlurrRenderer.cpp" />
-    <ClCompile Include="..\..\..\flurr\source\renderer\FlurrShader.cpp" />
-    <ClCompile Include="..\..\..\flurr\source\renderer\FlurrShaderProgram.cpp" />
-    <ClCompile Include="..\..\..\flurr\source\renderer\FlurrVertexArray.cpp" />
-    <ClCompile Include="..\..\..\flurr\source\renderer\FlurrVertexBuffer.cpp" />
-    <ClCompile Include="..\..\..\flurr\source\utils\FlurrString.cpp" />
-    <ClCompile Include="..\..\..\flurr\source\utils\FlurrTime.cpp" />
+    <ClCompile Include="..\..\..\flurr\source\renderer\Renderer.cpp" />
+    <ClCompile Include="..\..\..\flurr\source\renderer\Shader.cpp" />
+    <ClCompile Include="..\..\..\flurr\source\renderer\ShaderProgram.cpp" />
+    <ClCompile Include="..\..\..\flurr\source\renderer\VertexArray.cpp" />
+    <ClCompile Include="..\..\..\flurr\source\renderer\VertexBuffer.cpp" />
+    <ClCompile Include="..\..\..\flurr\source\utils\StringUtils.cpp" />
+    <ClCompile Include="..\..\..\flurr\source\utils\TimeUtils.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -87,7 +87,7 @@
       <SDLCheck>true</SDLCheck>
       <ExceptionHandling>false</ExceptionHandling>
       <AdditionalIncludeDirectories>$(SolutionDir)..\..\flurr\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>FLURR_DEBUG;_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>

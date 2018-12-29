@@ -3,43 +3,52 @@
 #include <chrono>
 #include <iostream>
 
-namespace flurr {
+namespace flurr
+{
 
-FlurrApplication::FlurrApplication(int window_width, int window_height, const std::string& window_title)
-  : window_width_(window_width > 0 ? window_width : 1024),
-  window_height_(window_height > 0 ? window_height : 768),
-  fullscreen_(window_width <= 0 || window_height <= 0),
-  window_title_(window_title),
-  window_(nullptr),
-  shutdown_(false) {
+FlurrApplication::FlurrApplication(int a_windowWidth, int a_windowHeight, const std::string& a_windowTitle)
+  : m_windowWidth(a_windowWidth > 0 ? a_windowWidth : 1024),
+  m_windowHeight(a_windowHeight > 0 ? a_windowHeight : 768),
+  m_fullscreen(a_windowWidth <= 0 || a_windowHeight <= 0),
+  m_windowTitle(a_windowTitle),
+  m_window(nullptr),
+  m_shutdown(false)
+{
 }
 
-int FlurrApplication::WindowWidth() const {
-  return window_width_;
+int FlurrApplication::WindowWidth() const
+{
+  return m_windowWidth;
 }
 
-int FlurrApplication::WindowHeight() const {
-  return window_height_;
+int FlurrApplication::WindowHeight() const
+{
+  return m_windowHeight;
 }
 
-bool FlurrApplication::IsFullScreen() const {
-  return fullscreen_;
+bool FlurrApplication::IsFullScreen() const
+{
+  return m_fullscreen;
 }
 
-const std::string& FlurrApplication::WindowTitle() const {
-  return window_title_;
+const std::string& FlurrApplication::WindowTitle() const
+{
+  return m_windowTitle;
 }
 
-GLFWwindow* FlurrApplication::GetWindow() const {
-  return window_;
+GLFWwindow* FlurrApplication::GetWindow() const
+{
+  return m_window;
 }
 
-int FlurrApplication::Run() {
+int FlurrApplication::Run()
+{
   FLURR_LOG_INFO("Initializing application...");
 
   // Initialize GLFW
   FLURR_LOG_INFO("Initializing GLFW...");
-  if (!glfwInit()) {
+  if (!glfwInit())
+  {
     FLURR_LOG_ERROR("Failed to initialize GLFW!");
     return -1;
   }
@@ -50,96 +59,105 @@ int FlurrApplication::Run() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-  window_ = glfwCreateWindow(
-    WindowWidth(), WindowHeight(), window_title_.c_str(),
+  m_window = glfwCreateWindow(
+    WindowWidth(), WindowHeight(), m_windowTitle.c_str(),
     IsFullScreen() ? glfwGetPrimaryMonitor() : nullptr, nullptr);
-  if (!window_) {
+  if (!m_window)
+  {
     FLURR_LOG_ERROR("Failed to create application window!");
     glfwTerminate();
     return -1;
   }
-  glfwMakeContextCurrent(window_);
+  glfwMakeContextCurrent(m_window);
 
   // Associate pointer to this FlurrApplication with the window
   // (needed in GLFW callbacks, which cannot be member functions)
-  glfwSetWindowUserPointer(window_, this);
+  glfwSetWindowUserPointer(m_window, this);
 
   // Initialize flurr
   FLURR_LOG_INFO("Initializing flurr...");
-  auto& flurr_core = FlurrCore::Get();
-  Status flurr_status = flurr_core.Init();
-  if (flurr_status != Status::kSuccess) {
-    FLURR_LOG_ERROR("flurr initialization failed (error: %u)!", FromEnum(flurr_status));
+  auto& flurrCore = FlurrCore::Get();
+  Status flurrStatus = flurrCore.init();
+  if (flurrStatus != Status::kSuccess)
+  {
+    FLURR_LOG_ERROR("flurr initialization failed (error: %u)!", FromEnum(flurrStatus));
     glfwTerminate();
     return -1;
   }
 
   // Initialize flurr renderer
   FLURR_LOG_INFO("Initializing flurr renderer...");
-  auto& flurr_renderer = FlurrOGLRenderer::Get();
-  flurr_status = flurr_renderer.Init();
-  if (flurr_status != Status::kSuccess) {
-    FLURR_LOG_ERROR("flurr renderer initialization failed (error: %u)!", FromEnum(flurr_status));
-    flurr_core.Shutdown();
+  auto& flurrRenderer = FlurrOGLRenderer::Get();
+  flurrStatus = flurrRenderer.init();
+  if (flurrStatus != Status::kSuccess)
+  {
+    FLURR_LOG_ERROR("flurr renderer initialization failed (error: %u)!", FromEnum(flurrStatus));
+    flurrCore.shutdown();
     glfwTerminate();
     return -1;
   }
 
   // Register GLFW callbacks
-  glfwSetFramebufferSizeCallback(window_, glfwFramebufferSizeCallback);
-  glfwSetKeyCallback(window_, glfwKeyCallback);
+  glfwSetFramebufferSizeCallback(m_window, glfwFramebufferSizeCallback);
+  glfwSetKeyCallback(m_window, glfwKeyCallback);
 
   // Application-specific initialization
   FLURR_LOG_INFO("Application-specific initialization...");
-  if (!OnInit()) {
+  if (!onInit())
+  {
     FLURR_LOG_ERROR("Application initialization failed!");
-    flurr_core.Shutdown();
+    flurrCore.shutdown();
     glfwTerminate();
     return -1;
   }
 
   // Start timing
-  auto time_start = std::chrono::high_resolution_clock::now();
+  auto timeStart = std::chrono::high_resolution_clock::now();
 
   // Update loop
   bool shutdown = false;
   int result = 0;
   FLURR_LOG_INFO("Starting update loop...");
-  while (!shutdown_) {
+  while (!m_shutdown)
+  {
     // Compute delta time
-    auto time_current = std::chrono::high_resolution_clock::now();
-    float delta_time = std::chrono::duration_cast<std::chrono::seconds>(time_current - time_start).count();
-    time_start = time_current;
+    auto timeCurrent = std::chrono::high_resolution_clock::now();
+    float deltaTime = std::chrono::duration_cast<std::chrono::seconds>(timeCurrent - timeStart).count();
+    timeStart = timeCurrent;
 
     // Application-specific update
-    if (!OnUpdate(delta_time))
+    if (!onUpdate(deltaTime))
       Quit();
 
     // Update flurr
-    if (flurr_core.Update(delta_time) != Status::kSuccess) {
+    if (flurrCore.update(deltaTime) != Status::kSuccess)
+    {
       Quit();
       result = -1;
       continue;
     }
 
+    // Application-specific drawing
+    onDraw();
+
     // Swap front and back buffers
-    glfwSwapBuffers(window_);
+    glfwSwapBuffers(m_window);
 
     // Process events
     glfwPollEvents();
 
     // Has user closed window?
-    if (glfwWindowShouldClose(window_) != 0)
+    if (glfwWindowShouldClose(m_window) != 0)
       Quit();
   }
 
   // Application-specific cleanup
   FLURR_LOG_INFO("Application-specific cleanup...");
-  OnQuit();
+  onQuit();
 
   // Shut down flurr
   FLURR_LOG_INFO("Shutting down flurr...");
-  flurr_core.Shutdown();
+  flurrCore.shutdown();
 
   // Shut down GLFW
   FLURR_LOG_INFO("Shutting down GLFW...");
@@ -148,54 +166,66 @@ int FlurrApplication::Run() {
   return 0;
 }
 
-void FlurrApplication::Quit() {
+void FlurrApplication::Quit()
+{
   FLURR_LOG_INFO("Quitting application...");
-  shutdown_ = true;
+  m_shutdown = true;
 }
 
-void FlurrApplication::UpdateCamera() {
+void FlurrApplication::UpdateCamera()
+{
   // TODO: update camera position and orientation based on user input
 }
 
-void FlurrApplication::OnKeyDown(int key) {
-  switch (key) {
-    case GLFW_KEY_ESCAPE: {
+void FlurrApplication::onKeyDown(int a_key)
+{
+  switch (a_key)
+  {
+    case GLFW_KEY_ESCAPE:
+    {
       Quit();
       break;
     }
-    default: {
+    default:
+    {
       break;
     }
   }
 }
 
-void FlurrApplication::OnKeyUp(int key) {
+void FlurrApplication::onKeyUp(int a_key)
+{
 }
 
-void FlurrApplication::glfwFramebufferSizeCallback(GLFWwindow* window, int width, int height) {
-  auto* app = static_cast<FlurrApplication*>(glfwGetWindowUserPointer(window));
+void FlurrApplication::glfwFramebufferSizeCallback(GLFWwindow* a_window, int a_width, int a_height)
+{
+  auto* app = static_cast<FlurrApplication*>(glfwGetWindowUserPointer(a_window));
   FLURR_ASSERT(app, "GLFW window user pointer must be set to owning FlurrApplication!");
 
   // Update renderer viewport size
-  auto* renderer = FlurrCore::Get().GetRenderer();
-  renderer->SetViewport(0, 0, width, height);
+  auto* renderer = FlurrCore::Get().getRenderer();
+  renderer->setViewport(0, 0, a_width, a_height);
 
   // Update application window size
-  app->window_width_ = width;
-  app->window_height_ = height;
-  app->OnWindowResize();
+  app->m_windowWidth = a_width;
+  app->m_windowHeight = a_height;
+  app->onWindowResize();
 }
 
-void FlurrApplication::glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-  auto* app = static_cast<FlurrApplication*>(glfwGetWindowUserPointer(window));
+void FlurrApplication::glfwKeyCallback(GLFWwindow* a_window, int a_key, int a_scancode, int a_action, int a_mods)
+{
+  auto* app = static_cast<FlurrApplication*>(glfwGetWindowUserPointer(a_window));
   FLURR_ASSERT(app, "GLFW window user pointer must be set to owning FlurrApplication!");
 
-  if (!mods) {
-    if (GLFW_PRESS == action) {
-      app->OnKeyDown(key);
+  if (!a_mods)
+  {
+    if (GLFW_PRESS == a_action)
+    {
+      app->onKeyDown(a_key);
     }
-    else if (GLFW_RELEASE == action) {
-      app->OnKeyUp(key);
+    else if (GLFW_RELEASE == a_action)
+    {
+      app->onKeyUp(a_key);
     }
   }
 }

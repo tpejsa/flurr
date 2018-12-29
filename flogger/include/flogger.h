@@ -1,5 +1,5 @@
 #pragma once
 
-#include "FlurrOGLRenderer.h"
-#include "FlurrOGLShaderProgram.h"
-#include "FlurrOGLShader.h"
+#include "flogger/OGLRenderer.h"
+#include "flogger/OGLShaderProgram.h"
+#include "flogger/OGLShader.h"

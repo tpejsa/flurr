@@ -12,24 +12,32 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\flogger\include\flogger.h" />
-    <ClInclude Include="..\..\..\flogger\include\FlurrOGLRenderer.h" />
-    <ClInclude Include="..\..\..\flogger\include\FlurrOGLShader.h" />
-    <ClInclude Include="..\..\..\flogger\include\FlurrOGLShaderProgram.h" />
-    <ClInclude Include="..\..\..\flogger\include\FlurrOGLVertexArray.h" />
-    <ClInclude Include="..\..\..\flogger\include\FlurrOGLVertexBuffer.h" />
+    <ClInclude Include="..\..\..\flogger\include\flogger\OGLRenderer.h" />
+    <ClInclude Include="..\..\..\flogger\include\flogger\OGLShader.h" />
+    <ClInclude Include="..\..\..\flogger\include\flogger\OGLShaderProgram.h" />
+    <ClInclude Include="..\..\..\flogger\include\flogger\OGLVertexArray.h" />
+    <ClInclude Include="..\..\..\flogger\include\flogger\OGLVertexBuffer.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\flogger\source\FlurrOGLRenderer.cpp" />
-    <ClCompile Include="..\..\..\flogger\source\FlurrOGLShader.cpp" />
-    <ClCompile Include="..\..\..\flogger\source\FlurrOGLShaderProgram.cpp" />
-    <ClCompile Include="..\..\..\flogger\source\FlurrOGLVertexArray.cpp" />
-    <ClCompile Include="..\..\..\flogger\source\FlurrOGLVertexBuffer.cpp" />
+    <ClCompile Include="..\..\..\flogger\source\OGLRenderer.cpp" />
+    <ClCompile Include="..\..\..\flogger\source\OGLShader.cpp" />
+    <ClCompile Include="..\..\..\flogger\source\OGLShaderProgram.cpp" />
+    <ClCompile Include="..\..\..\flogger\source\OGLVertexArray.cpp" />
+    <ClCompile Include="..\..\..\flogger\source\OGLVertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\flogger\resources\shaders\LitPhong.frag" />
-    <None Include="..\..\..\flogger\resources\shaders\LitPhong.vert" />
-    <None Include="..\..\..\flogger\resources\shaders\VertexColored.frag" />
-    <None Include="..\..\..\flogger\resources\shaders\VertexColored.vert" />
+    <Text Include="..\..\..\flogger\resources\shaders\LitPhong.frag">
+      <FileType>Document</FileType>
+    </Text>
+    <Text Include="..\..\..\flogger\resources\shaders\LitPhong.vert">
+      <FileType>Document</FileType>
+    </Text>
+    <Text Include="..\..\..\flogger\resources\shaders\VertexColored.frag">
+      <FileType>Document</FileType>
+    </Text>
+    <Text Include="..\..\..\flogger\resources\shaders\VertexColored.vert">
+      <FileType>Document</FileType>
+    </Text>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -80,7 +88,7 @@
       <SDLCheck>true</SDLCheck>
       <ExceptionHandling>false</ExceptionHandling>
       <AdditionalIncludeDirectories>$(SolutionDir)..\..\flurr\include;$(SolutionDir)..\..\flogger\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>FLURR_DEBUG;_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>

@@ -1,68 +1,80 @@
-#include "FlurrCore.h"
-#include "FlurrConfigFile.h"
-#include "FlurrLog.h"
+#include "flurr/FlurrCore.h"
+#include "flurr/FlurrLog.h"
+#include "flurr/utils/ConfigFile.h"
 
-namespace flurr {
+namespace flurr
+{
 
 FlurrCore::FlurrCore()
-  : initialized_(false) {
+  : m_initialized(false)
+{
 }
 
-FlurrCore::~FlurrCore() {
-  if (initialized_)
-    Shutdown();
+FlurrCore::~FlurrCore()
+{
+  if (m_initialized)
+    shutdown();
 }
 
-Status FlurrCore::Init(const std::string& config_path) {
+Status FlurrCore::init(const std::string& a_configPath)
+{
   FLURR_LOG_INFO("Initializing flurr...");
 
   FLURR_LOG_INFO("flurr initialized.");
-  initialized_ = true;
+  m_initialized = true;
   return Status::kSuccess;
 }
 
-void FlurrCore::Shutdown() {
+void FlurrCore::shutdown()
+{
   FLURR_LOG_INFO("Shutting down flurr...");
-  if (!initialized_) {
+  if (!m_initialized)
+  {
     FLURR_LOG_WARN("flurr not initialized!");
     return;
   }
 
-  if (renderer_) {
-    if (renderer_->IsInitialized())
-      renderer_->Shutdown();
-    renderer_ = nullptr;
+  if (m_renderer)
+  {
+    if (m_renderer->isInitialized())
+      m_renderer->shutdown();
+    m_renderer = nullptr;
   }
 
-  initialized_ = false;
+  m_initialized = false;
   FLURR_LOG_INFO("flurr shutdown complete.");
 }
 
-Status FlurrCore::Update(float delta_time) {
+Status FlurrCore::update(float a_deltaTime)
+{
   Status result = Status::kSuccess;
-  if (renderer_) {
-    if (!renderer_->IsInitialized()) {
+  if (m_renderer)
+  {
+    if (!m_renderer->isInitialized())
+    {
       FLURR_LOG_ERROR("Failed to update flurr; renderer not initialized!");
       return Status::kNotInitialized;
     }
 
-    result = renderer_->Update(delta_time);
+    result = m_renderer->update(a_deltaTime);
   }
 
   return result;
 }
 
-void FlurrCore::SetRenderer(FlurrRenderer* renderer) {
-  if (renderer)
+void FlurrCore::setRenderer(FlurrRenderer* a_renderer)
+{
+  if (a_renderer)
     FLURR_LOG_INFO("flurr renderer set.");
   else
     FLURR_LOG_INFO("flurr renderer unset.");
-  renderer_ = renderer;
+  m_renderer = a_renderer;
 }
 
-FlurrCore& FlurrCore::Get() {
-  static FlurrCore flurr_core;
-  return flurr_core;
+FlurrCore& FlurrCore::Get()
+{
+  static FlurrCore flurrCore;
+  return flurrCore;
 }
 
 } // namespace flurr
