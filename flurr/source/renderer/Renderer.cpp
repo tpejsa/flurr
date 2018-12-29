@@ -59,13 +59,16 @@ void FlurrRenderer::shutdown()
 
   // Destroy renderer resources
   for (auto&& vertexArrayKvp : m_vertexArrays)
-    destroyVertexArray(vertexArrayKvp.first);
+    if (vertexArrayKvp.second->isArrayCreated())
+      vertexArrayKvp.second->destroyArray();
   m_vertexArrays.clear();
   for (auto&& vertexBufferKvp : m_vertexBuffers)
-    destroyVertexBuffer(vertexBufferKvp.first);
+    if (vertexBufferKvp.second->getData())
+      vertexBufferKvp.second->destroyBuffer();
   m_vertexBuffers.clear();
   for (auto&& shaderProgramKvp : m_shaderPrograms)
-    destroyShaderProgram(shaderProgramKvp.first);
+    if (shaderProgramKvp.second->getProgramState() != ShaderProgramState::kDestroyed)
+      shaderProgramKvp.second->destroyProgram();
   m_shaderPrograms.clear();
 
   // Flag renderer as uninitialized

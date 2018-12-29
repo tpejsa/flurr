@@ -50,6 +50,11 @@ Status FlurrOGLRenderer::onInit()
   glEnable(GL_DEBUG_OUTPUT);
   glDebugMessageCallback(OGLDebugMessageCallback, 0);
 
+  // Print OpenGL capabilities
+  int numAttributes = 0;
+  glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &numAttributes);
+  FLURR_LOG_INFO("OpenGL info:\nNumber of attributes: %d", numAttributes);
+
   return Status::kSuccess;
 }
 

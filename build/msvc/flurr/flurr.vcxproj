@@ -21,6 +21,7 @@
     <ClInclude Include="..\..\..\flurr\include\flurr\renderer\Shader.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\renderer\VertexArray.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\renderer\VertexBuffer.h" />
+    <ClInclude Include="..\..\..\flurr\include\flurr\utils\MathUtils.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\utils\ObjectFactory.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\utils\StringUtils.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\utils\TimeUtils.h" />

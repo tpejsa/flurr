@@ -39,6 +39,14 @@ public:
   virtual void destroyProgram();
   virtual Status useProgram();
 
+  virtual bool setFloatValue(const std::string& name, float value) = 0;
+  virtual bool setVec2Value(const std::string& name, const glm::vec2& value) = 0;
+  virtual bool setVec3Value(const std::string& name, const glm::vec3& value) = 0;
+  virtual bool setVec4Value(const std::string& name, const glm::vec4& value) = 0;
+  virtual bool setIntValue(const std::string& name, int value) = 0;
+  virtual bool setUIntValue(const std::string& name, uint32_t value) = 0;
+  virtual bool setBoolValue(const std::string& name, bool value) = 0;
+
 private:
 
   virtual Shader* onCreateShader(ShaderType a_shaderType, ShaderProgram* a_owningProgram) = 0;

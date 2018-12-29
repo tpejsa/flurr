@@ -122,7 +122,7 @@ int FlurrApplication::Run()
   {
     // Compute delta time
     auto timeCurrent = std::chrono::high_resolution_clock::now();
-    float deltaTime = std::chrono::duration_cast<std::chrono::seconds>(timeCurrent - timeStart).count();
+    float deltaTime = std::chrono::duration_cast<std::chrono::duration<float>>(timeCurrent - timeStart).count();
     timeStart = timeCurrent;
 
     // Application-specific update
