@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 namespace flurr
 {
@@ -36,13 +37,22 @@ public:
   bool hasShaderProgram(FlurrHandle a_programHandle) const;
   ShaderProgram* getShaderProgram(FlurrHandle a_programHandle) const;
   void destroyShaderProgram(FlurrHandle a_programHandle);
+  Status compileShader(FlurrHandle a_programHandle, ShaderType a_shaderType, FlurrHandle a_shaderResourceHandle);
+  Status linkShaderProgram(FlurrHandle a_programHandle);
+  Status useShaderProgram(FlurrHandle a_programHandle);
   FlurrHandle createVertexBuffer();
+  bool hasVertexBuffer(FlurrHandle a_bufferHandle) const;
   VertexBuffer* getVertexBuffer(FlurrHandle a_bufferHandle) const;
   void destroyVertexBuffer(FlurrHandle a_bufferHandle);
+  Status initVertexBuffer(FlurrHandle a_bufferHandle, VertexBufferType a_bufferType, std::size_t a_dataSize, void* a_data, std::size_t a_attributeSize, VertexDataUsage a_dataUsage = VertexDataUsage::kStatic);
+  Status initIndexBuffer(FlurrHandle a_bufferHandle, std::size_t a_dataSize, void* a_data, VertexDataUsage a_dataUsage = VertexDataUsage::kStatic);
+  Status useVertexBuffer(FlurrHandle a_bufferHandle);
   FlurrHandle createVertexArray();
   bool hasVertexArray(FlurrHandle a_arrayHandle) const;
   VertexArray* getVertexArray(FlurrHandle a_arrayHandle) const;
   void destroyVertexArray(FlurrHandle a_arrayHandle);
+  Status initVertexArray(FlurrHandle a_arrayHandle, const std::vector<FlurrHandle>& a_attributeBufferHandles, FlurrHandle a_indexBufferHandle);
+  Status drawVertexArray(FlurrHandle a_arrayHandle);
 
 private:
 

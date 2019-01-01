@@ -15,7 +15,7 @@ public:
   OGLShader(ShaderType a_shaderType, ShaderProgram* a_owningProgram);
   ~OGLShader() override;
 
-  Status compile(const std::string& a_shaderPath, ShaderCreateMode a_createMode) override;
+  Status compile(FlurrHandle a_shaderResourceHandle) override;
   void destroy() override;
   GLuint getOGLShaderId() const { return m_oglShaderId; }
 

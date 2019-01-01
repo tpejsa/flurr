@@ -16,7 +16,7 @@ OGLVertexBuffer::~OGLVertexBuffer()
     glDeleteBuffers(1, &m_oglVboId);
 }
 
-Status OGLVertexBuffer::onCreateBuffer()
+Status OGLVertexBuffer::onInitBuffer()
 {
   if (m_oglVboId)
   {

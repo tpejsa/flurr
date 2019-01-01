@@ -27,19 +27,19 @@ public:
   VertexBuffer* getAttributeBuffer(std::size_t a_attributeIndex) const;
   std::size_t getAttributeBuffersCount() const { return m_attributeBufferHandles.size(); }
   VertexBuffer* getIndexBuffer() const;
-  Status createArray();
-  bool isArrayCreated() const { return m_isArrayCreated; }
+  Status initArray();
+  bool isArrayInitialized() const { return m_isArrayInitialized; }
   void destroyArray();
   Status drawArray();
 
 private:
 
-  virtual Status onCreateArray() = 0;
+  virtual Status onInitArray() = 0;
   virtual void onDestroyArray() = 0;
   virtual Status onDrawArray() = 0;
 
   FlurrHandle m_arrayHandle;
-  bool m_isArrayCreated;
+  bool m_isArrayInitialized;
   std::vector<FlurrHandle> m_attributeBufferHandles;
   FlurrHandle m_indexBufferHandle;
 };

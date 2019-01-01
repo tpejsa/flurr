@@ -6,7 +6,8 @@ namespace flurr
 {
 
 FlurrCore::FlurrCore()
-  : m_initialized(false)
+  : m_initialized(false),
+  m_resourceManager(std::make_unique<ResourceManager>())
 {
 }
 
@@ -19,6 +20,16 @@ FlurrCore::~FlurrCore()
 Status FlurrCore::init(const std::string& a_configPath)
 {
   FLURR_LOG_INFO("Initializing flurr...");
+
+  // TODO: load engine config
+
+  // Initialize resource manager
+  m_resourceManager->addResourceDirectory("./"); // TODO: condition this on a config setting
+  if (!m_resourceManager->run())
+  {
+    FLURR_LOG_ERROR("Failed to start up ResourceManager thread!");
+    return Status::kFailed;
+  }
 
   FLURR_LOG_INFO("flurr initialized.");
   m_initialized = true;
@@ -34,6 +45,7 @@ void FlurrCore::shutdown()
     return;
   }
 
+  // Shut down renderer (if set)
   if (m_renderer)
   {
     if (m_renderer->isInitialized())
@@ -41,12 +53,26 @@ void FlurrCore::shutdown()
     m_renderer = nullptr;
   }
 
+  // Stop ResourceManager
+  m_resourceManager->stop();
+  m_resourceManager->removeAllResourceDirectories();
+
   m_initialized = false;
   FLURR_LOG_INFO("flurr shutdown complete.");
 }
 
 Status FlurrCore::update(float a_deltaTime)
 {
+  if (!m_initialized)
+  {
+    FLURR_LOG_ERROR("flurr not initialized!");
+    return Status::kNotInitialized;
+  }
+
+  // Update resource listeners
+  m_resourceManager->updateListeners();
+
+  // Update renderer
   Status result = Status::kSuccess;
   if (m_renderer)
   {

@@ -19,7 +19,7 @@ public:
 
 private:
 
-  Status onCreateBuffer() override;
+  Status onInitBuffer() override;
   void onDestroyBuffer() override;
   Status onUseBuffer() override;
 

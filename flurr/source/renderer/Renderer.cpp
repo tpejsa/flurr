@@ -59,7 +59,7 @@ void FlurrRenderer::shutdown()
 
   // Destroy renderer resources
   for (auto&& vertexArrayKvp : m_vertexArrays)
-    if (vertexArrayKvp.second->isArrayCreated())
+    if (vertexArrayKvp.second->isArrayInitialized())
       vertexArrayKvp.second->destroyArray();
   m_vertexArrays.clear();
   for (auto&& vertexBufferKvp : m_vertexBuffers)
@@ -92,7 +92,7 @@ FlurrHandle FlurrRenderer::createShaderProgram()
   if (!m_initialized)
   {
     FLURR_LOG_WARN("flurr renderer not initialized!");
-    return INVALID_OBJECT;
+    return INVALID_HANDLE;
   }
 
   // Create ShaderProgram instance
@@ -134,14 +134,82 @@ void FlurrRenderer::destroyShaderProgram(FlurrHandle a_programHandle)
   m_shaderPrograms.erase(a_programHandle);
 }
 
+Status FlurrRenderer::compileShader(FlurrHandle a_programHandle, ShaderType a_shaderType, FlurrHandle a_shaderResourceHandle)
+{
+  if (!m_initialized)
+  {
+    FLURR_LOG_WARN("flurr renderer not initialized!");
+    return Status::kInvalidState;
+  }
+
+  // Get ShaderProgram object
+  auto* shaderProgram = getShaderProgram(a_programHandle);
+  if (!shaderProgram)
+  {
+    FLURR_LOG_WARN("No ShaderProgram with handle %u!", a_programHandle);
+    return Status::kInvalidArgument;
+  }
+
+  return shaderProgram->compileShader(a_shaderType, a_shaderResourceHandle);
+}
+
+Status FlurrRenderer::linkShaderProgram(FlurrHandle a_programHandle)
+{
+  if (!m_initialized)
+  {
+    FLURR_LOG_WARN("flurr renderer not initialized!");
+    return Status::kInvalidState;
+  }
+
+  // Get ShaderProgram object
+  auto* shaderProgram = getShaderProgram(a_programHandle);
+  if (!shaderProgram)
+  {
+    FLURR_LOG_WARN("No ShaderProgram with handle %u!", a_programHandle);
+    return Status::kInvalidArgument;
+  }
+
+  return shaderProgram->linkProgram();
+}
+
+Status FlurrRenderer::useShaderProgram(FlurrHandle a_programHandle)
+{
+  if (!m_initialized)
+  {
+    FLURR_LOG_WARN("flurr renderer not initialized!");
+    return Status::kInvalidState;
+  }
+
+  // Get ShaderProgram object
+  auto* shaderProgram = getShaderProgram(a_programHandle);
+  if (!shaderProgram)
+  {
+    FLURR_LOG_WARN("No ShaderProgram with handle %u!", a_programHandle);
+    return Status::kInvalidArgument;
+  }
+
+  return shaderProgram->useProgram();
+}
+
 FlurrHandle FlurrRenderer::createVertexBuffer()
 {
+  if (!m_initialized)
+  {
+    FLURR_LOG_WARN("flurr renderer not initialized!");
+    return INVALID_HANDLE;
+  }
+
   // Create VertexBuffer instance
   FlurrHandle bufferHandle = m_nextVertexBufferHandle++;
   auto* vertexBuffer = onCreateVertexBuffer(bufferHandle);
   m_vertexBuffers.emplace(bufferHandle, std::unique_ptr<VertexBuffer>(vertexBuffer));
 
   return bufferHandle;
+}
+
+bool FlurrRenderer::hasVertexBuffer(FlurrHandle a_bufferHandle) const
+{
+  return m_vertexBuffers.find(a_bufferHandle) != m_vertexBuffers.end();
 }
 
 VertexBuffer* FlurrRenderer::getVertexBuffer(FlurrHandle a_bufferHandle) const
@@ -172,12 +240,69 @@ void FlurrRenderer::destroyVertexBuffer(FlurrHandle a_bufferHandle)
   m_vertexBuffers.erase(a_bufferHandle);
 }
 
+Status FlurrRenderer::initVertexBuffer(FlurrHandle a_bufferHandle, VertexBufferType a_bufferType, std::size_t a_dataSize, void* a_data, std::size_t a_attributeSize, VertexDataUsage a_dataUsage)
+{
+  if (!m_initialized)
+  {
+    FLURR_LOG_WARN("flurr renderer not initialized!");
+    return Status::kInvalidState;
+  }
+
+  // Get VertexBuffer object
+  auto* vertexBuffer = getVertexBuffer(a_bufferHandle);
+  if (!vertexBuffer)
+  {
+    FLURR_LOG_WARN("No VertexBuffer with handle %u!", a_bufferHandle);
+    return Status::kInvalidArgument;
+  }
+
+  return vertexBuffer->initBuffer(a_bufferType, a_dataSize, a_data, a_attributeSize, a_dataUsage);
+}
+
+Status FlurrRenderer::initIndexBuffer(FlurrHandle a_bufferHandle, std::size_t a_dataSize, void* a_data, VertexDataUsage a_dataUsage)
+{
+  if (!m_initialized)
+  {
+    FLURR_LOG_WARN("flurr renderer not initialized!");
+    return Status::kInvalidState;
+  }
+
+  // Get VertexBuffer object
+  auto* vertexBuffer = getVertexBuffer(a_bufferHandle);
+  if (!vertexBuffer)
+  {
+    FLURR_LOG_WARN("No VertexBuffer with handle %u!", a_bufferHandle);
+    return Status::kInvalidArgument;
+  }
+
+  return vertexBuffer->initIndexBuffer(a_dataSize, a_data, a_dataUsage);
+}
+
+Status FlurrRenderer::useVertexBuffer(FlurrHandle a_bufferHandle)
+{
+  if (!m_initialized)
+  {
+    FLURR_LOG_WARN("flurr renderer not initialized!");
+    return Status::kInvalidState;
+  }
+
+  // Get VertexBuffer object
+  auto* vertexBuffer = getVertexBuffer(a_bufferHandle);
+  if (!vertexBuffer)
+  {
+    FLURR_LOG_WARN("No VertexBuffer with handle %u!", a_bufferHandle);
+    return Status::kInvalidArgument;
+  }
+
+  return vertexBuffer->useBuffer();
+}
+
 FlurrHandle FlurrRenderer::createVertexArray()
 {
   if (!m_initialized)
   {
     FLURR_LOG_WARN("flurr renderer not initialized!");
-    return INVALID_OBJECT;
+    return INVALID_HANDLE;
   }
 
   // Create VertexArray instance
@@ -214,9 +339,59 @@ void FlurrRenderer::destroyVertexArray(FlurrHandle a_arrayHandle)
     return;
   }
 
-  if (vertexArray->isArrayCreated())
+  if (vertexArray->isArrayInitialized())
     vertexArray->destroyArray();
   m_vertexArrays.erase(a_arrayHandle);
+}
+
+Status FlurrRenderer::initVertexArray(FlurrHandle a_arrayHandle, const std::vector<FlurrHandle>& a_attributeBufferHandles, FlurrHandle a_indexBufferHandle)
+{
+  if (!m_initialized)
+  {
+    FLURR_LOG_WARN("flurr renderer not initialized!");
+    return Status::kInvalidState;
+  }
+
+  // Get VertexArray object
+  auto* vertexArray = getVertexArray(a_arrayHandle);
+  if (!vertexArray)
+  {
+    FLURR_LOG_WARN("No VertexArray with handle %u!", a_arrayHandle);
+    return Status::kInvalidArgument;
+  }
+
+  // Add attribute buffers to the vertex array
+  Status result;
+  for (auto attributeBufferHandle : a_attributeBufferHandles)
+  {
+    result = vertexArray->addAttributeBuffer(attributeBufferHandle);
+    if (Status::kSuccess != result)
+      return result;
+  }
+  result = vertexArray->setIndexBuffer(a_indexBufferHandle);
+  if (Status::kSuccess != result)
+    return result;
+
+  return vertexArray->initArray();
+}
+
+Status FlurrRenderer::drawVertexArray(FlurrHandle a_arrayHandle)
+{
+  if (!m_initialized)
+  {
+    FLURR_LOG_WARN("flurr renderer not initialized!");
+    return Status::kInvalidState;
+  }
+
+  // Get VertexArray object
+  auto* vertexArray = getVertexArray(a_arrayHandle);
+  if (!vertexArray)
+  {
+    FLURR_LOG_WARN("No VertexArray with handle %u!", a_arrayHandle);
+    return Status::kInvalidArgument;
+  }
+
+  return vertexArray->drawArray();
 }
 
 } // namespace flurr

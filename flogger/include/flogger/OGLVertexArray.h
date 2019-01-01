@@ -19,7 +19,7 @@ public:
 
 private:
 
-  Status onCreateArray() override;
+  Status onInitArray() override;
   void onDestroyArray() override;
   Status onDrawArray() override;
 

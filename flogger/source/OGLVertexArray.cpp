@@ -17,7 +17,7 @@ OGLVertexArray::~OGLVertexArray()
     glDeleteVertexArrays(1, &m_oglVaoId);
 }
 
-Status OGLVertexArray::onCreateArray()
+Status OGLVertexArray::onInitArray()
 {
   glGenVertexArrays(1, &m_oglVaoId);
   glBindVertexArray(m_oglVaoId);

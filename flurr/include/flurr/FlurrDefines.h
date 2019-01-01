@@ -22,7 +22,7 @@ namespace flurr
 
 // flurr object handles
 using FlurrHandle = uint32_t;
-constexpr FlurrHandle INVALID_OBJECT = 0;
+constexpr FlurrHandle INVALID_HANDLE = 0;
 
 // flurr status codes
 enum class Status : uint16_t
@@ -31,6 +31,7 @@ enum class Status : uint16_t
   kFailed,
   kNullArgument,
   kInvalidArgument,
+  kIndexOutOfBounds,
   kOpenFileError,
   kReadFileError,
   kNotInitialized,
@@ -39,7 +40,13 @@ enum class Status : uint16_t
   kUnsupportedMode,
   kCompilationFailed,
   kLinkingFailed,
-  kInvalidState
+  kInvalidState,
+  kResourceFileNotFound,
+  kResourceAlreadyExists,
+  kResourceNotCreated,
+  kResourceAlreadyLoaded,
+  kResourceNotLoaded,
+  kResourceDestroying
 };
 
 } // namespace flurr

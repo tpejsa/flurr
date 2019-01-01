@@ -16,12 +16,6 @@ enum class ShaderType : uint8_t
   kFragment
 };
 
-enum class ShaderCreateMode : uint8_t
-{
-  kFromSource = 0,
-  kFromBinary
-};
-
 class FLURR_DLL_EXPORT Shader
 {
 
@@ -36,7 +30,7 @@ public:
 
   ShaderType getShaderType() const { return m_shaderType; }
   ShaderProgram* getOwningProgram() const { return m_owningProgram; }
-  virtual Status compile(const std::string& a_shaderPath, ShaderCreateMode a_createMode) = 0;
+  virtual Status compile(FlurrHandle a_shaderResourceHandle) = 0;
   virtual void destroy() = 0;
 
 private:

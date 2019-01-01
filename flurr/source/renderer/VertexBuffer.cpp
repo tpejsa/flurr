@@ -13,7 +13,7 @@ VertexBuffer::VertexBuffer(FlurrHandle a_bufferHandle)
 {
 }
 
-Status VertexBuffer::createBuffer(VertexBufferType a_bufferType, std::size_t a_dataSize, void* a_data, std::size_t a_attributeSize, VertexDataUsage a_dataUsage)
+Status VertexBuffer::initBuffer(VertexBufferType a_bufferType, std::size_t a_dataSize, void* a_data, std::size_t a_attributeSize, VertexDataUsage a_dataUsage)
 {
   if (nullptr == a_data)
   {
@@ -38,11 +38,11 @@ Status VertexBuffer::createBuffer(VertexBufferType a_bufferType, std::size_t a_d
   m_dataSize = a_dataSize;
   m_data = a_data;
   m_attributeSize = a_attributeSize;
-  return onCreateBuffer();
+  return onInitBuffer();
 }
 
-Status VertexBuffer::createIndexBuffer(std::size_t a_dataSize, void* a_data, VertexDataUsage a_dataUsage) {
-  return createBuffer(VertexBufferType::kIndex, a_dataSize, a_data, sizeof(uint32_t), a_dataUsage);
+Status VertexBuffer::initIndexBuffer(std::size_t a_dataSize, void* a_data, VertexDataUsage a_dataUsage) {
+  return initBuffer(VertexBufferType::kIndex, a_dataSize, a_data, sizeof(uint32_t), a_dataUsage);
 }
 
 void VertexBuffer::destroyBuffer()

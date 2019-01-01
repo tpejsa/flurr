@@ -7,14 +7,14 @@ namespace flurr
 
 VertexArray::VertexArray(FlurrHandle a_arrayHandle)
   : m_arrayHandle(a_arrayHandle),
-  m_isArrayCreated(false),
-  m_indexBufferHandle(INVALID_OBJECT)
+  m_isArrayInitialized(false),
+  m_indexBufferHandle(INVALID_HANDLE)
 {
 }
 
 Status VertexArray::addAttributeBuffer(FlurrHandle a_bufferHandle)
 {
-  if (m_isArrayCreated)
+  if (m_isArrayInitialized)
   {
     FLURR_LOG_ERROR("Unable to add vertex attribute buffer; vertex array already created!");
     return Status::kInvalidState;
@@ -47,7 +47,7 @@ Status VertexArray::addAttributeBuffer(FlurrHandle a_bufferHandle)
 }
 
 Status VertexArray::setIndexBuffer(FlurrHandle a_bufferHandle) {
-  if (m_isArrayCreated)
+  if (m_isArrayInitialized)
   {
     FLURR_LOG_ERROR("Unable to set index buffer; vertex array already created!");
     return Status::kInvalidState;
@@ -91,9 +91,9 @@ VertexBuffer* VertexArray::getIndexBuffer() const
   return renderer->getVertexBuffer(m_indexBufferHandle);
 }
 
-Status VertexArray::createArray()
+Status VertexArray::initArray()
 {
-  if (m_isArrayCreated)
+  if (m_isArrayInitialized)
   {
     FLURR_LOG_ERROR("Unable to create vertex array; already created!");
     return Status::kInvalidState;
@@ -111,8 +111,8 @@ Status VertexArray::createArray()
     return Status::kInvalidState;
   }
 
-  Status result = onCreateArray();
-  if (Status::kSuccess == result) m_isArrayCreated = true;
+  Status result = onInitArray();
+  if (Status::kSuccess == result) m_isArrayInitialized = true;
   return result;
 }
 
@@ -121,13 +121,13 @@ void VertexArray::destroyArray()
   // Delete vertex array
   onDestroyArray();
   m_attributeBufferHandles.clear();
-  m_indexBufferHandle = INVALID_OBJECT;
-  m_isArrayCreated = false;
+  m_indexBufferHandle = INVALID_HANDLE;
+  m_isArrayInitialized = false;
 }
 
 Status VertexArray::drawArray()
 {
-  if (!m_isArrayCreated)
+  if (!m_isArrayInitialized)
   {
     FLURR_LOG_ERROR("Unable to draw vertex array; not created yet!");
     return Status::kInvalidState;

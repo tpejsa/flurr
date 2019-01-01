@@ -16,9 +16,13 @@ private:
   void onDraw() override;
   void onQuit() override;
 
-  // Geometry 1 (two vertex-colored triangles)
+  // Shader paths
   static constexpr const char kVS1Path[] = "resources/shaders/VertexColored.vert";
   static constexpr const char kFS1Path[] = "resources/shaders/VertexColored.frag";
+  static constexpr const char kVS2Path[] = "resources/shaders/LitPhong.vert";
+  static constexpr const char kFS2Path[] = "resources/shaders/LitPhong.frag";
+
+  // Geometry 1 definition (two vertex-colored triangles)
   static constexpr const float kPositionData1[] = {
     0.0f, 0.0f, 0.0f,
     0.25f, -0.75f, 0.0f,
@@ -36,9 +40,7 @@ private:
     1, 2, 3
   };
 
-  // Geometry 2 (one uniformly-colored triangle)
-  static constexpr const char kVS2Path[] = "resources/shaders/LitPhong.vert";
-  static constexpr const char kFS2Path[] = "resources/shaders/LitPhong.frag";
+  // Geometry 2 definition (one uniformly-colored triangle)
   static constexpr const float kPositionData2[] = {
     0.75f, 0.75f, 0.0f,
     0.75f, 0.0f, 0.0f,
@@ -48,15 +50,21 @@ private:
     0, 1, 2
   };
 
-  // Geometry 1
+  // Shaders
+  FlurrHandle m_vs1ResourceHandle;
+  FlurrHandle m_fs1ResourceHandle;
   FlurrHandle m_sp1Handle;
+  FlurrHandle m_vs2ResourceHandle;
+  FlurrHandle m_fs2ResourceHandle;
+  FlurrHandle m_sp2Handle;
+
+  // Geometry 1
   FlurrHandle m_vb1PosHandle;
   FlurrHandle m_vb1ColorHandle;
   FlurrHandle m_ib1Handle;
   FlurrHandle m_va1Handle;
 
   // Geometry 2
-  FlurrHandle m_sp2Handle;
   FlurrHandle m_vb2PosHandle;
   FlurrHandle m_ib2Handle;
   FlurrHandle m_va2Handle;

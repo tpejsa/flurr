@@ -13,6 +13,9 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\flurr\include\flurr.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\renderer\ShaderProgram.h" />
+    <ClInclude Include="..\..\..\flurr\include\flurr\resource\Resource.h" />
+    <ClInclude Include="..\..\..\flurr\include\flurr\resource\ResourceManager.h" />
+    <ClInclude Include="..\..\..\flurr\include\flurr\resource\ShaderResource.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\utils\ConfigFile.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\FlurrCore.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\FlurrDefines.h" />
@@ -28,6 +31,9 @@
     <ClInclude Include="..\..\..\flurr\include\flurr\utils\TypeCasts.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\flurr\source\resource\Resource.cpp" />
+    <ClCompile Include="..\..\..\flurr\source\resource\ResourceManager.cpp" />
+    <ClCompile Include="..\..\..\flurr\source\resource\ShaderResource.cpp" />
     <ClCompile Include="..\..\..\flurr\source\utils\ConfigFile.cpp" />
     <ClCompile Include="..\..\..\flurr\source\FlurrCore.cpp" />
     <ClCompile Include="..\..\..\flurr\source\FlurrLog.cpp" />

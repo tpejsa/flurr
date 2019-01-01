@@ -11,7 +11,7 @@ ShaderProgram::ShaderProgram(FlurrHandle a_programHandle)
 {
 }
 
-Status ShaderProgram::compileShader(ShaderType a_shaderType, const std::string& a_shaderPath, ShaderCreateMode a_createMode)
+Status ShaderProgram::compileShader(ShaderType a_shaderType, FlurrHandle a_shaderResourceHandle)
 {
   if (ShaderProgramState::kLinked == m_programState)
   {
@@ -26,7 +26,7 @@ Status ShaderProgram::compileShader(ShaderType a_shaderType, const std::string& 
   }
 
   auto* shader = onCreateShader(a_shaderType, this);
-  Status compileStatus = shader->compile(a_shaderPath, a_createMode);
+  Status compileStatus = shader->compile(a_shaderResourceHandle);
   if (Status::kSuccess != compileStatus)
   {
     shader->destroy();

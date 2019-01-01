@@ -1,9 +1,9 @@
 #include "flogger/OGLShader.h"
+#include "flurr/FlurrCore.h"
+#include "flurr/resource/ShaderResource.h"
 #include "flurr/FlurrLog.h"
 #include "flurr/utils/TypeCasts.h"
 
-#include <fstream>
-#include <streambuf>
 #include <string>
 
 namespace flurr
@@ -21,7 +21,7 @@ OGLShader::~OGLShader()
     glDeleteShader(m_oglShaderId);
 }
 
-Status OGLShader::compile(const std::string& a_shaderPath, ShaderCreateMode a_createMode)
+Status OGLShader::compile(FlurrHandle a_shaderResourceHandle)
 {
   GLenum oglShaderType = getOGLShaderType(getShaderType());
   if (0 == oglShaderType)
@@ -30,32 +30,34 @@ Status OGLShader::compile(const std::string& a_shaderPath, ShaderCreateMode a_cr
     return Status::kUnsupportedType;
   }
 
-  if (ShaderCreateMode::kFromSource != a_createMode)
+  // Get shader resource
+  auto* resourceManager = FlurrCore::Get().getResourceManager();
+  auto* shaderResource = static_cast<ShaderResource*>(resourceManager->getResource(a_shaderResourceHandle));
+  if (!shaderResource)
   {
-    FLURR_LOG_ERROR("Shader can only be compiled from source!");
-    return Status::kUnsupportedMode;
+    FLURR_LOG_ERROR("Unable to compile shader; shader resource %s does not exist!", shaderResource->getResourcePath().c_str());
+    return Status::kInvalidHandle;
   }
-
-  // Load shader source
-  std::ifstream ifs(a_shaderPath);
-  if (!ifs.good())
+  if (shaderResource->getResourceState() != ResourceState::kLoaded)
   {
-    FLURR_LOG_ERROR("Failed to read shader source %s!", a_shaderPath.c_str());
-    return Status::kOpenFileError;
+    FLURR_LOG_ERROR("Unable to compile shader; shader resource %s not loaded!", shaderResource->getResourcePath().c_str());
+    return Status::kResourceNotLoaded;
   }
-  std::string shaderSourceStr((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
-  const auto* shaderSourceData = shaderSourceStr.data();
-  GLint shaderSourceLength = static_cast<GLint>(shaderSourceStr.length());
 
   // Create and compile shader
+  auto&& shaderResourceLock = shaderResource->lockResource();
+  const auto& shaderSource = shaderResource->getShaderSource();
+  const auto* shaderSourceData = shaderSource.data();
+  GLint shaderSourceLength = static_cast<GLint>(shaderSource.length());
   m_oglShaderId = glCreateShader(oglShaderType);
   if (0 == m_oglShaderId)
   {
-    FLURR_LOG_ERROR("Failed to create shader!");
+    FLURR_LOG_ERROR("Failed to create shader %s!", shaderResource->getResourcePath().c_str());
     return Status::kFailed;
   }
   glShaderSource(m_oglShaderId, 1, &shaderSourceData, &shaderSourceLength);
   glCompileShader(m_oglShaderId);
+  shaderResourceLock.unlock();
 
   // Check for compilation errors
   GLint result = 0;
@@ -65,7 +67,7 @@ Status OGLShader::compile(const std::string& a_shaderPath, ShaderCreateMode a_cr
     static const int kInfoLogSize = 1024;
     GLchar infoLog[kInfoLogSize];
     glGetShaderInfoLog(m_oglShaderId, kInfoLogSize, nullptr, &infoLog[0]);
-    FLURR_LOG_ERROR("Failed to compile shader %s!\n%s", a_shaderPath.c_str(), infoLog);
+    FLURR_LOG_ERROR("Failed to compile shader %s!\n%s", shaderResource->getResourcePath().c_str(), infoLog);
 
     return Status::kCompilationFailed;
   }

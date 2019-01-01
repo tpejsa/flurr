@@ -34,14 +34,14 @@ public:
   void* getData() const { return m_data; }
   std::size_t getAttributeSize() const { return m_attributeSize; }
   VertexDataUsage getDataUsage() const { return m_dataUsage; }
-  Status createBuffer(VertexBufferType a_bufferType, std::size_t a_dataSize, void* a_data, std::size_t a_attributeSize, VertexDataUsage a_dataUsage = VertexDataUsage::kStatic);
-  Status createIndexBuffer(std::size_t a_dataSize, void* a_data, VertexDataUsage a_dataUsage = VertexDataUsage::kStatic);
+  Status initBuffer(VertexBufferType a_bufferType, std::size_t a_dataSize, void* a_data, std::size_t a_attributeSize, VertexDataUsage a_dataUsage = VertexDataUsage::kStatic);
+  Status initIndexBuffer(std::size_t a_dataSize, void* a_data, VertexDataUsage a_dataUsage = VertexDataUsage::kStatic);
   void destroyBuffer();
   Status useBuffer();
 
 private:
 
-  virtual Status onCreateBuffer() = 0;
+  virtual Status onInitBuffer() = 0;
   virtual void onDestroyBuffer() = 0;
   virtual Status onUseBuffer() = 0;
 
