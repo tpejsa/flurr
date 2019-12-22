@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -12,6 +12,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\flurr\include\flurr.h" />
+    <ClInclude Include="..\..\..\flurr\include\flurr\resource\TextureResource.h" />
+    <ClInclude Include="..\..\..\flurr\include\flurr\TextureResource.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\renderer\ShaderProgram.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\resource\Resource.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\resource\ResourceManager.h" />
@@ -24,16 +26,26 @@
     <ClInclude Include="..\..\..\flurr\include\flurr\renderer\Shader.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\renderer\VertexArray.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\renderer\VertexBuffer.h" />
+    <ClInclude Include="..\..\..\flurr\include\flurr\utils\FileUtils.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\utils\MathUtils.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\utils\ObjectFactory.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\utils\StringUtils.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\utils\TimeUtils.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\utils\TypeCasts.h" />
+    <ClInclude Include="..\..\..\flurr\source\stbi\image_DXT.h" />
+    <ClInclude Include="..\..\..\flurr\source\stbi\image_helper.h" />
+    <ClInclude Include="..\..\..\flurr\source\stbi\stbi_DDS_aug.h" />
+    <ClInclude Include="..\..\..\flurr\source\stbi\stbi_DDS_aug_c.h" />
+    <ClInclude Include="..\..\..\flurr\source\stbi\stb_image_aug.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\flurr\source\resource\Resource.cpp" />
     <ClCompile Include="..\..\..\flurr\source\resource\ResourceManager.cpp" />
     <ClCompile Include="..\..\..\flurr\source\resource\ShaderResource.cpp" />
+    <ClCompile Include="..\..\..\flurr\source\resource\TextureResource.cpp" />
+    <ClCompile Include="..\..\..\flurr\source\stbi\image_DXT.c" />
+    <ClCompile Include="..\..\..\flurr\source\stbi\image_helper.c" />
+    <ClCompile Include="..\..\..\flurr\source\stbi\stb_image_aug.c" />
     <ClCompile Include="..\..\..\flurr\source\utils\ConfigFile.cpp" />
     <ClCompile Include="..\..\..\flurr\source\FlurrCore.cpp" />
     <ClCompile Include="..\..\..\flurr\source\FlurrLog.cpp" />
@@ -42,6 +54,7 @@
     <ClCompile Include="..\..\..\flurr\source\renderer\ShaderProgram.cpp" />
     <ClCompile Include="..\..\..\flurr\source\renderer\VertexArray.cpp" />
     <ClCompile Include="..\..\..\flurr\source\renderer\VertexBuffer.cpp" />
+    <ClCompile Include="..\..\..\flurr\source\utils\FileUtils.cpp" />
     <ClCompile Include="..\..\..\flurr\source\utils\StringUtils.cpp" />
     <ClCompile Include="..\..\..\flurr\source\utils\TimeUtils.cpp" />
   </ItemGroup>
@@ -93,8 +106,8 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ExceptionHandling>false</ExceptionHandling>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\flurr\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>FLURR_DEBUG;_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\flurr\include;$(SolutionDir)..\..\flurr\source;$(SolutionDir)..\..\flurr\source\stbi</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>FLURR_DEBUG;_HAS_EXCEPTIONS=0;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
@@ -103,6 +116,8 @@
       <OutputFile>$(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary>$(SolutionDir)..\..\lib\$(Platform)\$(ConfigurationName)\$(TargetName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -113,8 +128,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ExceptionHandling>false</ExceptionHandling>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\flurr\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\flurr\include;$(SolutionDir)..\..\flurr\source;$(SolutionDir)..\..\flurr\source\stbi</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
@@ -125,6 +140,8 @@
       <OutputFile>$(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary>$(SolutionDir)..\..\lib\$(Platform)\$(ConfigurationName)\$(TargetName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

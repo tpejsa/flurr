@@ -34,6 +34,7 @@ enum class Status : uint16_t
   kIndexOutOfBounds,
   kOpenFileError,
   kReadFileError,
+  kUnsupportedFileType,
   kNotInitialized,
   kInvalidHandle,
   kUnsupportedType,
@@ -46,7 +47,7 @@ enum class Status : uint16_t
   kResourceNotCreated,
   kResourceAlreadyLoaded,
   kResourceNotLoaded,
-  kResourceDestroying
+  kResourceDestroying,
 };
 
 } // namespace flurr

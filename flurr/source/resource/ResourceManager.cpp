@@ -1,5 +1,6 @@
 #include "flurr/resource/ResourceManager.h"
 #include "flurr/resource/ShaderResource.h"
+#include "flurr/resource/TextureResource.h"
 #include "flurr/FlurrLog.h"
 
 #include <algorithm>
@@ -37,6 +38,11 @@ bool ResourceManager::run()
 void ResourceManager::stop()
 {
   destroyAllResources();
+
+  // Remove any remaining resource listeners
+  std::unique_lock<std::mutex> listenerLock(m_resourceListenerMutex);
+  m_resourceListeners.clear();
+  listenerLock.unlock();
 
   m_stopResourceThread = true;
   if (m_resourceThread.joinable())
@@ -513,6 +519,10 @@ Resource* ResourceManager::createResourceOfType(ResourceType a_resourceType, Flu
     case ResourceType::kShader:
     {
       return new ShaderResource(a_resourceHandle, a_resourcePath, a_resourceDirectoryIndex, this);
+    }
+    case ResourceType::kTexture:
+    {
+      return new TextureResource(a_resourceHandle, a_resourcePath, a_resourceDirectoryIndex, this);
     }
     default:
     {

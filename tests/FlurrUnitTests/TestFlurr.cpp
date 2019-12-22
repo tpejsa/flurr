@@ -23,6 +23,8 @@ using flurr::ResourceOperationResult;
 using flurr::ResourceOperationType;
 using flurr::ResourceType;
 using flurr::ResourceState;
+using flurr::TextureResource;
+using flurr::TextureFormat;
 
 class FlurrTest : public ::testing::Test
 {
@@ -252,9 +254,9 @@ TEST_F(FlurrTest, FlurrResourceManager)
   EXPECT_TRUE(resourceManager->isRunning());
 
   // Test resource creation
-  static const std::string kShaderPath1 = "resources/shaders/LitPhong.vert";
-  static const std::string kShaderPath2 = "resources/shaders/LitPhong.frag";
-  static const std::string kShaderPath3 = "resources/shaders/blahblah.vert";
+  static const std::string kShaderPath1 = "resources/common/shaders/LitPhong.vert";
+  static const std::string kShaderPath2 = "resources/common/shaders/LitPhong.frag";
+  static const std::string kShaderPath3 = "resources/common/shaders/blahblah.vert";
   FlurrHandle shaderResourceHandle1 = INVALID_HANDLE;
   FlurrHandle shaderResourceHandle2 = INVALID_HANDLE;
   FlurrHandle shaderResourceHandle3 = INVALID_HANDLE;
@@ -269,9 +271,9 @@ TEST_F(FlurrTest, FlurrResourceManager)
   EXPECT_TRUE(resourceManager->hasResource(shaderResourceHandle1));
   auto* shaderResource1 = resourceManager->getResource(shaderResourceHandle1);
   auto* shaderResource2 = resourceManager->getResource(shaderResourceHandle2);
-  EXPECT_TRUE(shaderResource1);
-  EXPECT_TRUE(shaderResource2);
-  EXPECT_TRUE(shaderResource1 == resourceManager->getResource(kShaderPath1));
+  ASSERT_TRUE(shaderResource1);
+  ASSERT_TRUE(shaderResource2);
+  ASSERT_TRUE(shaderResource1 == resourceManager->getResource(kShaderPath1));
   EXPECT_TRUE(shaderResource1->getResourceHandle() == shaderResourceHandle1);
   EXPECT_TRUE(shaderResource1->getResourcePath() == kShaderPath1);
   EXPECT_TRUE(shaderResource1->getResourceFullPath() == ("./" + kShaderPath1));
@@ -332,6 +334,46 @@ TEST_F(FlurrTest, FlurrResourceManager)
     == Status::kSuccess);
   FlurrCore::Get().shutdown();
   EXPECT_FALSE(resourceManager->hasResource(shaderResourceHandle1));
+}
+
+// Test texture resources
+TEST_F(FlurrTest, FlurrTextureResources)
+{
+  EXPECT_TRUE(FlurrCore::Get().init() == Status::kSuccess);
+  auto* resourceManager = FlurrCore::Get().getResourceManager();
+  ASSERT_TRUE(resourceManager);
+  EXPECT_TRUE(resourceManager->isRunning());
+
+  // Test texture creation
+  static const std::string kTexPath = "resources/common/textures/Checkers.png";
+  FlurrHandle texResourceHandle = INVALID_HANDLE;
+  EXPECT_TRUE(resourceManager->createResource(ResourceType::kTexture, kTexPath, texResourceHandle)
+    == Status::kSuccess);
+  EXPECT_TRUE(texResourceHandle != INVALID_HANDLE);
+  auto* texResource = static_cast<TextureResource*>(resourceManager->getResource(texResourceHandle));
+  ASSERT_TRUE(texResource);
+
+  // Test texture loading
+  static constexpr int kUpdateTimeMSec = 100;
+  static constexpr float kUpdateTimeSec = kUpdateTimeMSec / 1000.0f;
+  std::this_thread::sleep_for(std::chrono::milliseconds(kUpdateTimeMSec));
+  FlurrCore::Get().update(kUpdateTimeSec);
+  EXPECT_TRUE(Status::kSuccess == resourceManager->loadResource(texResourceHandle));
+  std::this_thread::sleep_for(std::chrono::milliseconds(kUpdateTimeMSec * 10));
+  FlurrCore::Get().update(kUpdateTimeSec * 10);
+  EXPECT_TRUE(texResource->getResourceState() == ResourceState::kLoaded);
+
+  // Test texture data
+  EXPECT_TRUE(texResource->getResourceType() == ResourceType::kTexture);
+  EXPECT_TRUE(texResource->getTextureData());
+  static constexpr uint32_t kTexSize = 256;
+  EXPECT_TRUE(texResource->getTextureWidth() == kTexSize);
+  EXPECT_TRUE(texResource->getTextureHeight() == kTexSize);
+  EXPECT_TRUE(texResource->getTextureFormat() == TextureFormat::kGrayscale);
+  // TODO: why is this not grayscale???
+
+  // Perform shutdown
+  FlurrCore::Get().shutdown();
 }
 
 int main(int argc, char **argv)

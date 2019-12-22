@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -11,52 +11,33 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\flogger\include\flogger.h" />
-    <ClInclude Include="..\..\..\flogger\include\flogger\OGLRenderer.h" />
-    <ClInclude Include="..\..\..\flogger\include\flogger\OGLShader.h" />
-    <ClInclude Include="..\..\..\flogger\include\flogger\OGLShaderProgram.h" />
-    <ClInclude Include="..\..\..\flogger\include\flogger\OGLVertexArray.h" />
-    <ClInclude Include="..\..\..\flogger\include\flogger\OGLVertexBuffer.h" />
+    <ClCompile Include="..\..\..\samples\common\FlurrApplication.cpp" />
+    <ClCompile Include="..\..\..\samples\HelloTextures\HelloTexturesApplication.cpp" />
+    <ClCompile Include="..\..\..\samples\HelloTextures\HelloTexturesMain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\flogger\source\OGLRenderer.cpp" />
-    <ClCompile Include="..\..\..\flogger\source\OGLShader.cpp" />
-    <ClCompile Include="..\..\..\flogger\source\OGLShaderProgram.cpp" />
-    <ClCompile Include="..\..\..\flogger\source\OGLVertexArray.cpp" />
-    <ClCompile Include="..\..\..\flogger\source\OGLVertexBuffer.cpp" />
+    <ClInclude Include="..\..\..\samples\common\FlurrApplication.h" />
+    <ClInclude Include="..\..\..\samples\HelloTextures\HelloTexturesApplication.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\..\..\flogger\resources\shaders\LitPhong.frag">
-      <FileType>Document</FileType>
-    </Text>
-    <Text Include="..\..\..\flogger\resources\shaders\LitPhong.vert">
-      <FileType>Document</FileType>
-    </Text>
-    <Text Include="..\..\..\flogger\resources\shaders\UnlitVertexColored.frag">
-      <FileType>Document</FileType>
-    </Text>
-    <Text Include="..\..\..\flogger\resources\shaders\UnlitVertexColored.vert">
-      <FileType>Document</FileType>
-    </Text>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\..\..\flogger\resources\textures\Checkers.png" />
+    <Image Include="..\..\..\samples\HelloTextures\resources\BrickWall1.png" />
+    <Image Include="..\..\..\samples\HelloTextures\resources\BrickWall2.dds" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{2B575766-DECE-49D3-86C3-CE468805E8E0}</ProjectGuid>
+    <ProjectGuid>{76326129-22EE-4DD4-8927-FB7737D8931F}</ProjectGuid>
     <RootNamespace>flurr</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -75,13 +56,13 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(GLEW)include;$(GLM);$(IncludePath)</IncludePath>
-    <LibraryPath>$(GLEW)lib\Release\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(GLFW)include;$(GLEW)include;$(GLM);$(GTEST_ROOT)include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(GLFW)lib-vc2015;$(GLEW)lib\Release\x64;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(GLEW)include;$(GLM);$(IncludePath)</IncludePath>
-    <LibraryPath>$(GLEW)lib\Release\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(GLFW)include;$(GLEW)include;$(GLM);$(GTEST_ROOT)include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(GLFW)lib-vc2015;$(GLEW)lib\Release\x64;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -90,22 +71,21 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ExceptionHandling>false</ExceptionHandling>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\flurr\include;$(SolutionDir)..\..\flogger\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\flurr\include;$(SolutionDir)..\..\flogger\include;$(SolutionDir)..\..\samples\common;$(SolutionDir)..\..\samples\$(ProjectName)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>FLURR_DEBUG;_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <OutputFile>$(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>flurr.lib;opengl32.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32.lib;flurr.lib;flogger.lib;gtestd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary>$(SolutionDir)..\..\lib\$(Platform)\$(ConfigurationName)\$(TargetName).lib</ImportLibrary>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\lib\$(Platform)\$(ConfigurationName)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\lib\$(Platform)\$(ConfigurationName)\;$(GTEST_ROOT)msvc\2010\gtest\$(Platform)-$(ConfigurationName)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>rd /s /q $(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\resources
-md $(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\resources\common
-xcopy $(SolutionDir)..\..\flogger\resources\*.* $(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\resources\common /c /e /i /q /r /s /y</Command>
+      <Command>rd /s /q $(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\resources\HelloTextures
+md $(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\resources\HelloTextures
+xcopy $(SolutionDir)..\..\samples\HelloTextures\resources\*.* $(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\resources\HelloTextures /c /e /i /q /r /s /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -116,24 +96,23 @@ xcopy $(SolutionDir)..\..\flogger\resources\*.* $(SolutionDir)..\..\bin\$(Platfo
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ExceptionHandling>false</ExceptionHandling>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\flurr\include;$(SolutionDir)..\..\flogger\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\flurr\include;$(SolutionDir)..\..\flogger\include;$(SolutionDir)..\..\samples\common;$(SolutionDir)..\..\samples\$(ProjectName)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <OutputFile>$(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>flurr.lib;opengl32.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32.lib;flurr.lib;flogger.lib;gtest.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary>$(SolutionDir)..\..\lib\$(Platform)\$(ConfigurationName)\$(TargetName).lib</ImportLibrary>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\..\lib\$(Platform)\$(ConfigurationName)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\lib\$(Platform)\$(ConfigurationName)\;$(GTEST_ROOT)msvc\2010\gtest\$(Platform)-$(ConfigurationName)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>rd /s /q $(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\resources
-md $(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\resources\common
-xcopy $(SolutionDir)..\..\flogger\resources\*.* $(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\resources\common /c /e /i /q /r /s /y</Command>
+      <Command>rd /s /q $(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\resources\HelloTextures
+md $(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\resources\HelloTextures
+xcopy $(SolutionDir)..\..\samples\HelloTextures\resources\*.* $(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\resources\HelloTextures /c /e /i /q /r /s /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

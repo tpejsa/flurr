@@ -164,6 +164,12 @@ bool HelloTriangleApplication::onInit()
     return false;
   }
 
+  // Safe to unload resources now that everything has been created
+  resourceManager->unloadResource(m_vs1ResourceHandle);
+  resourceManager->unloadResource(m_fs1ResourceHandle);
+  resourceManager->unloadResource(m_vs2ResourceHandle);
+  resourceManager->unloadResource(m_fs2ResourceHandle);
+
   return true;
 }
 

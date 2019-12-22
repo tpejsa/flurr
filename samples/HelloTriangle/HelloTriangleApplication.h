@@ -17,10 +17,10 @@ private:
   void onQuit() override;
 
   // Shader paths
-  static constexpr const char kVS1Path[] = "resources/shaders/VertexColored.vert";
-  static constexpr const char kFS1Path[] = "resources/shaders/VertexColored.frag";
-  static constexpr const char kVS2Path[] = "resources/shaders/LitPhong.vert";
-  static constexpr const char kFS2Path[] = "resources/shaders/LitPhong.frag";
+  static constexpr const char kVS1Path[] = "resources/common/shaders/UnlitVertexColored.vert";
+  static constexpr const char kFS1Path[] = "resources/common/shaders/UnlitVertexColored.frag";
+  static constexpr const char kVS2Path[] = "resources/common/shaders/LitPhong.vert";
+  static constexpr const char kFS2Path[] = "resources/common/shaders/LitPhong.frag";
 
   // Geometry 1 definition (two vertex-colored triangles)
   static constexpr const float kPositionData1[] = {

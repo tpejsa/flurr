@@ -13,7 +13,8 @@ class ResourceManager;
 
 enum class ResourceType : uint8_t
 {
-  kShader = 0
+  kShader = 0,
+  kTexture
 };
 
 enum class ResourceState : uint8_t
