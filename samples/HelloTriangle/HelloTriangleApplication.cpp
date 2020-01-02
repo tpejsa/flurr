@@ -29,7 +29,7 @@ bool HelloTriangleApplication::onInit()
 {
   // Load vertex color shader resources
   auto* resourceManager = FlurrCore::Get().getResourceManager();
-  if (Status::kSuccess != resourceManager->createResource(ResourceType::kShader, kVS1Path, m_vs1ResourceHandle))
+  if (Status::kSuccess != resourceManager->createResource(m_vs1ResourceHandle, ResourceType::kShader, kVS1Path))
   {
     FLURR_LOG_ERROR("Failed to create shader resource %s!", kVS1Path);
     return false;
@@ -39,7 +39,7 @@ bool HelloTriangleApplication::onInit()
     FLURR_LOG_ERROR("Failed to load shader resource %s!", kVS1Path);
     return false;
   }
-  if (Status::kSuccess != resourceManager->createResource(ResourceType::kShader, kFS1Path, m_fs1ResourceHandle))
+  if (Status::kSuccess != resourceManager->createResource(m_fs1ResourceHandle, ResourceType::kShader, kFS1Path))
   {
     FLURR_LOG_ERROR("Failed to create shader resource %s!", kFS1Path);
     return false;
@@ -52,7 +52,7 @@ bool HelloTriangleApplication::onInit()
 
   // Compile and link vertex color shaders
   auto* renderer = FlurrCore::Get().getRenderer();
-  m_sp1Handle = renderer->createShaderProgram();
+  renderer->createShaderProgram(m_sp1Handle);
   if (Status::kSuccess != renderer->compileShader(m_sp1Handle, ShaderType::kVertex, m_vs1ResourceHandle))
   {
     FLURR_LOG_ERROR("Failed to compile vertex shader %s!", kVS1Path);
@@ -70,38 +70,37 @@ bool HelloTriangleApplication::onInit()
   }
 
   // Create vertex buffers for geometry 1
-  m_vb1PosHandle = renderer->createVertexBuffer();
-  if (Status::kSuccess != renderer->initVertexBuffer(m_vb1PosHandle, VertexBufferType::kVertexAttribute,
-    sizeof(kPositionData1), const_cast<float*>(&kPositionData1[0]), 3*sizeof(float)))
+  Status result = renderer->createVertexBuffer(m_vb1PosHandle, VertexBufferType::kVertexAttribute,
+    sizeof(kPositionData1), const_cast<float*>(&kPositionData1[0]), 3*sizeof(float));
+  if (Status::kSuccess != result)
   {
     FLURR_LOG_ERROR("Failed to create vertex buffer for positions 1!");
     return false;
   }
-  m_vb1ColorHandle = renderer->createVertexBuffer();
-  if (Status::kSuccess != renderer->initVertexBuffer(m_vb1ColorHandle, VertexBufferType::kVertexAttribute,
-    sizeof(kColorData1), const_cast<float*>(&kColorData1[0]), 3*sizeof(float)))
+  result = renderer->createVertexBuffer(m_vb1ColorHandle, VertexBufferType::kVertexAttribute,
+    sizeof(kColorData1), const_cast<float*>(&kColorData1[0]), 3*sizeof(float));
+  if (Status::kSuccess != result)
   {
     FLURR_LOG_ERROR("Failed to create vertex buffer for colors 1!");
     return false;
   }
-  m_ib1Handle = renderer->createVertexBuffer();
-  if (Status::kSuccess != renderer->initIndexBuffer(m_ib1Handle,
-    sizeof(kIndexData1), const_cast<uint32_t*>(&kIndexData1[0])))
+  result = renderer->createIndexBuffer(m_ib1Handle, sizeof(kIndexData1), const_cast<uint32_t*>(&kIndexData1[0]));
+  if (Status::kSuccess != result)
   {
     FLURR_LOG_ERROR("Failed to create index buffer 1!");
     return false;
   }
 
   // Create vertex array for geometry 1
-  m_va1Handle = renderer->createVertexArray();
-  if (Status::kSuccess != renderer->initVertexArray(m_va1Handle, {m_vb1PosHandle, m_vb1ColorHandle}, m_ib1Handle))
+  result = renderer->createVertexArray(m_va1Handle, {m_vb1PosHandle, m_vb1ColorHandle}, m_ib1Handle);
+  if (Status::kSuccess != result)
   {
     FLURR_LOG_ERROR("Failed to create vertex array 1!");
     return false;
   }
 
   // Load Phong shader resources
-  if (Status::kSuccess != resourceManager->createResource(ResourceType::kShader, kVS2Path, m_vs2ResourceHandle))
+  if (Status::kSuccess != resourceManager->createResource(m_vs2ResourceHandle, ResourceType::kShader, kVS2Path))
   {
     FLURR_LOG_ERROR("Failed to create shader resource %s!", kVS2Path);
     return false;
@@ -111,7 +110,7 @@ bool HelloTriangleApplication::onInit()
     FLURR_LOG_ERROR("Failed to load shader resource %s!", kVS2Path);
     return false;
   }
-  if (Status::kSuccess != resourceManager->createResource(ResourceType::kShader, kFS2Path, m_fs2ResourceHandle))
+  if (Status::kSuccess != resourceManager->createResource(m_fs2ResourceHandle, ResourceType::kShader, kFS2Path))
   {
     FLURR_LOG_ERROR("Failed to create shader resource %s!", kFS2Path);
     return false;
@@ -123,7 +122,12 @@ bool HelloTriangleApplication::onInit()
   }
 
   // Compile and link Phong shaders
-  m_sp2Handle = renderer->createShaderProgram();
+  result = renderer->createShaderProgram(m_sp2Handle);
+  if (Status::kSuccess != result)
+  {
+    FLURR_LOG_ERROR("Failed to create shader program 2!");
+    return false;
+  }
   if (Status::kSuccess != renderer->compileShader(m_sp2Handle, ShaderType::kVertex, m_vs2ResourceHandle))
   {
     FLURR_LOG_ERROR("Failed to compile vertex shader %s!", kVS2Path);
@@ -141,24 +145,23 @@ bool HelloTriangleApplication::onInit()
   }
 
   // Create vertex buffers for geometry 2
-  m_vb2PosHandle = renderer->createVertexBuffer();
-  if (Status::kSuccess != renderer->initVertexBuffer(m_vb2PosHandle, VertexBufferType::kVertexAttribute,
-    sizeof(kPositionData2), const_cast<float*>(&kPositionData2[0]), 3 * sizeof(float)))
+  result = renderer->createVertexBuffer(m_vb2PosHandle, VertexBufferType::kVertexAttribute,
+    sizeof(kPositionData2), const_cast<float*>(&kPositionData2[0]), 3*sizeof(float));
+  if (Status::kSuccess != result)
   {
     FLURR_LOG_ERROR("Failed to create vertex buffer for positions 2!");
     return false;
   }
-  m_ib2Handle = renderer->createVertexBuffer();
-  if (Status::kSuccess != renderer->initIndexBuffer(m_ib2Handle,
-    sizeof(kIndexData2), const_cast<uint32_t*>(&kIndexData2[0])))
+  result = renderer->createIndexBuffer(m_ib2Handle, sizeof(kIndexData2), const_cast<uint32_t*>(&kIndexData2[0]));
+  if (Status::kSuccess != result)
   {
     FLURR_LOG_ERROR("Failed to create index buffer 2!");
     return false;
   }
 
   // Create vertex array for geometry 2
-  m_va2Handle = renderer->createVertexArray();
-  if (Status::kSuccess != renderer->initVertexArray(m_va2Handle, {m_vb2PosHandle}, m_ib2Handle))
+  result = renderer->createVertexArray(m_va2Handle, {m_vb2PosHandle}, m_ib2Handle);
+  if (Status::kSuccess != result)
   {
     FLURR_LOG_ERROR("Failed to create vertex array 2!");
     return false;
@@ -169,6 +172,12 @@ bool HelloTriangleApplication::onInit()
   resourceManager->unloadResource(m_fs1ResourceHandle);
   resourceManager->unloadResource(m_vs2ResourceHandle);
   resourceManager->unloadResource(m_fs2ResourceHandle);
+
+  // Disable diffuse texture map in the Phong shader
+  renderer->useShaderProgram(m_sp2Handle);
+  auto* sp2 = renderer->getShaderProgram(m_sp2Handle);
+  if (!sp2->setBoolValue("diffuseMapEnabled", false))
+    FLURR_LOG_ERROR("Failed to resolve uniform diffuseMapEnabled!");
 
   return true;
 }
@@ -189,12 +198,13 @@ void HelloTriangleApplication::onDraw()
   // Draw geometry 2
   renderer->useShaderProgram(m_sp2Handle);
   auto* sp2 = renderer->getShaderProgram(m_sp2Handle);
-  const glm::vec3 albedo(
+  const glm::vec4 diffuseColor(
     sin(m_albedoTime*glm::pi<float>()/2.0f)/2.0f + 0.5f,
     sin((m_albedoTime/2.0f + 0.25f)*glm::pi<float>())/2.0f + 0.5f,
-    sin((m_albedoTime/2.0f + 0.5f)*glm::pi<float>())/2.0f + 0.5f);
-  if (!sp2->setVec3Value("albedo", albedo))
-    FLURR_LOG_ERROR("Failed to resolve uniform albedo!");
+    sin((m_albedoTime/2.0f + 0.5f)*glm::pi<float>())/2.0f + 0.5f,
+    1.0f);
+  if (!sp2->setVec4Value("diffuseColor", diffuseColor))
+    FLURR_LOG_ERROR("Failed to resolve uniform diffuseColor!");
   renderer->drawVertexArray(m_va2Handle);
 }
 

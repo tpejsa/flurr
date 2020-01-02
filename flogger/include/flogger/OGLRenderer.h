@@ -29,6 +29,7 @@ private:
   Status onUpdate(float a_deltaTime) override;
 
   ShaderProgram* onCreateShaderProgram(FlurrHandle a_programHandle) override;
+  Texture* onCreateTexture(FlurrHandle a_texHandle) override;
   VertexBuffer* onCreateVertexBuffer(FlurrHandle a_bufferHandle) override;
   VertexArray* onCreateVertexArray(FlurrHandle a_arrayHandle) override;
 };

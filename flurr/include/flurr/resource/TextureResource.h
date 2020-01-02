@@ -8,8 +8,8 @@ namespace flurr
 enum class TextureFormat : uint32_t
 {
   kGrayscale,
-  kBGR,
-  kBGRA
+  kRGB,
+  kRGBA
 };
 
 class FLURR_DLL_EXPORT TextureResource : public Resource
@@ -25,10 +25,14 @@ public:
 
   ResourceType getResourceType() const override { return ResourceType::kTexture; }
 
-  const uint8_t* getTextureData() const { return m_textureData; }
-  uint32_t getTextureWidth() const { return m_textureWidth; }
-  uint32_t getTextureHeight() const { return m_textureHeight; }
-  TextureFormat getTextureFormat() const { return m_textureFormat; }
+  const uint8_t* getTextureData() const { return m_texData; }
+  uint32_t getTextureWidth() const { return m_texWidth; }
+  uint32_t getTextureHeight() const { return m_texHeight; }
+  TextureFormat getTextureFormat() const { return m_texFormat; }
+  uint32_t getTextureDataSize() const { return m_texWidth*m_texHeight*getTexelSize(); }
+  uint32_t getTexelSize() const;
+
+  static constexpr uint32_t TexelSize(const TextureFormat a_texFormat); // in bytes
 
 private:
 
@@ -36,11 +40,12 @@ private:
   void onUnload() override;
   void onDestroy() override {}
   void destroyTextureData();
+  void FlipY();
 
-  uint8_t* m_textureData;
-  uint32_t m_textureWidth;
-  uint32_t m_textureHeight;
-  TextureFormat m_textureFormat;
+  uint8_t* m_texData;
+  uint32_t m_texWidth;
+  uint32_t m_texHeight;
+  TextureFormat m_texFormat;
 };
 
 } // namespace flurr

@@ -12,8 +12,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\flurr\include\flurr.h" />
+    <ClInclude Include="..\..\..\flurr\include\flurr\renderer\Texture.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\resource\TextureResource.h" />
-    <ClInclude Include="..\..\..\flurr\include\flurr\TextureResource.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\renderer\ShaderProgram.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\resource\Resource.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\resource\ResourceManager.h" />
@@ -39,6 +39,7 @@
     <ClInclude Include="..\..\..\flurr\source\stbi\stb_image_aug.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\flurr\source\renderer\Texture.cpp" />
     <ClCompile Include="..\..\..\flurr\source\resource\Resource.cpp" />
     <ClCompile Include="..\..\..\flurr\source\resource\ResourceManager.cpp" />
     <ClCompile Include="..\..\..\flurr\source\resource\ShaderResource.cpp" />

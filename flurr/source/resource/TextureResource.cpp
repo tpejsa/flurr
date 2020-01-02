@@ -1,21 +1,52 @@
 #include "flurr/resource/TextureResource.h"
 #include "flurr/FlurrLog.h"
 #include "flurr/utils/FileUtils.h"
+#include "flurr/utils/TypeCasts.h"
 
 #include "stb_image_aug.h"
 extern "C" {
 #include "stbi_DDS_aug.h"
 }
 
+#include <cassert>
 #include <cstdio>
+#include <vector>
 
 namespace flurr
 {
 
 TextureResource::TextureResource(FlurrHandle a_resourceHandle, const std::string& a_resourcePath, std::size_t a_resourceDirectoryIndex, ResourceManager* a_owningManager)
   : Resource(a_resourceHandle, a_resourcePath, a_resourceDirectoryIndex, a_owningManager),
-  m_textureData(nullptr)
+  m_texData(nullptr)
 {
+}
+
+uint32_t TextureResource::getTexelSize() const
+{
+  return TexelSize(m_texFormat);
+}
+
+constexpr uint32_t TextureResource::TexelSize(TextureFormat a_texFormat)
+{
+  switch (a_texFormat)
+  {
+    case TextureFormat::kGrayscale:
+    {
+      return 1;
+    }
+    case TextureFormat::kRGB:
+    {
+      return 3;
+    }
+    case TextureFormat::kRGBA:
+    {
+      return 4;
+    }
+    default:
+    {
+      FLURR_ASSERT(false, "Unhandled texture format %u!", FromEnum(a_texFormat));
+    }
+  }
 }
 
 Status TextureResource::onLoad(const std::string& a_fullPath)
@@ -44,8 +75,8 @@ Status TextureResource::onLoad(const std::string& a_fullPath)
     }
 
     // Load texture from the file
-    m_textureData = stbi_dds_load_from_file(textureFile, reinterpret_cast<int*>(&m_textureWidth), reinterpret_cast<int*>(&m_textureHeight), &numChannels, 0);
-    if (!m_textureData)
+    m_texData = stbi_dds_load_from_file(textureFile, reinterpret_cast<int*>(&m_texWidth), reinterpret_cast<int*>(&m_texHeight), &numChannels, 0);
+    if (!m_texData)
     {
       FLURR_LOG_ERROR("Failed to load texture from file %s!", a_fullPath.c_str());
       fclose(textureFile);
@@ -64,8 +95,8 @@ Status TextureResource::onLoad(const std::string& a_fullPath)
     }
 
     // Load texture from the file
-    m_textureData = stbi_load_from_file(textureFile, reinterpret_cast<int*>(&m_textureWidth), reinterpret_cast<int*>(&m_textureHeight), &numChannels, 0);
-    if (!m_textureData)
+    m_texData = stbi_load_from_file(textureFile, reinterpret_cast<int*>(&m_texWidth), reinterpret_cast<int*>(&m_texHeight), &numChannels, 0);
+    if (!m_texData)
     {
       FLURR_LOG_ERROR("Failed to load texture from file %s!", a_fullPath.c_str());
       fclose(textureFile);
@@ -78,17 +109,17 @@ Status TextureResource::onLoad(const std::string& a_fullPath)
   {
     case 2:
     {
-      m_textureFormat = TextureFormat::kGrayscale;
+      m_texFormat = TextureFormat::kGrayscale;
       break;
     }
     case 3:
     {
-      m_textureFormat = TextureFormat::kBGR;
+      m_texFormat = TextureFormat::kRGB;
       break;
     }
     case 4:
     {
-      m_textureFormat = TextureFormat::kBGRA;
+      m_texFormat = TextureFormat::kRGBA;
       break;
     }
     default:
@@ -97,6 +128,9 @@ Status TextureResource::onLoad(const std::string& a_fullPath)
       return Status::kUnsupportedFileType;
     }
   }
+
+  // Flip image around horizontal axis
+  FlipY();
 
   return Status::kSuccess;
 }
@@ -108,10 +142,23 @@ void TextureResource::onUnload()
 
 void TextureResource::destroyTextureData()
 {
-  if (m_textureData) delete[] m_textureData;
-  m_textureData = nullptr;
-  m_textureWidth = 0;
-  m_textureHeight = 0;
+  if (m_texData)
+    stbi_image_free(m_texData);
+  m_texData = nullptr;
+  m_texWidth = 0;
+  m_texHeight = 0;
+}
+
+void TextureResource::FlipY()
+{
+  std::vector<uint8_t> tempRow(getTextureDataSize(), 0);
+  const uint32_t rowSize = m_texWidth*getTexelSize();
+  for (uint32_t rowIndex = 0; rowIndex < m_texHeight/2; ++rowIndex)
+  {
+    memcpy(tempRow.data(), m_texData + rowIndex*rowSize, rowSize);
+    memcpy(m_texData + rowIndex*rowSize, m_texData + (m_texHeight-rowIndex-1)*rowSize, rowSize);
+    memcpy(m_texData + (m_texHeight-rowIndex-1)*rowSize, tempRow.data(), rowSize);
+  }
 }
 
 } // namespace flurr

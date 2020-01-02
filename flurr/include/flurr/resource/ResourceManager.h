@@ -3,6 +3,7 @@
 #include "flurr/FlurrDefines.h"
 #include "flurr/resource/Resource.h"
 
+#include <atomic>
 #include <mutex>
 #include <thread>
 #include <unordered_map>
@@ -62,7 +63,7 @@ public:
   void stop();
   void updateListeners();
 
-  Status createResource(ResourceType a_resourceType, const std::string& a_resourcePath, FlurrHandle& a_resourceHandle);
+  Status createResource(FlurrHandle& a_resourceHandle, ResourceType a_resourceType, const std::string& a_resourcePath);
   Status loadResource(FlurrHandle a_resourceHandle, bool a_loadAsyc = true);
   Status unloadResource(FlurrHandle a_resourceHandle);
   Status destroyResource(FlurrHandle a_resourceHandle);
@@ -70,8 +71,11 @@ public:
 
   bool hasResource(FlurrHandle a_resourceHandle) const;
   bool hasResource(const std::string& a_resourcePath) const;
-  Resource* getResource(FlurrHandle a_resourceHandle) const;
-  Resource* getResource(const std::string& a_resourcePath) const;
+  std::unique_lock<std::mutex> acquireResource(Resource** a_resource, FlurrHandle a_resourceHandle);
+  std::unique_lock<std::mutex> acquireResource(Resource** a_resource, const std::string& a_resourcePath);
+  std::unique_lock<std::mutex> lockResources() { return std::unique_lock<std::mutex>(m_resourceMutex); }
+  Resource* getResource(FlurrHandle a_resourceHandle) const; // not thread-safe; call lockResources beforehand
+  Resource* getResource(const std::string& a_resourcePath) const; // not thread-safe; call lockResources beforehand
 
   void addListener(ResourceListener* a_listener);
   void removeListener(ResourceListener* a_listener);

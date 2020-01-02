@@ -29,6 +29,7 @@ enum class Status : uint16_t
 {
   kSuccess = 0,
   kFailed,
+  kNotImplemented,
   kNullArgument,
   kInvalidArgument,
   kIndexOutOfBounds,
@@ -48,6 +49,9 @@ enum class Status : uint16_t
   kResourceAlreadyLoaded,
   kResourceNotLoaded,
   kResourceDestroying,
+  kResourceTypeInvalid,
+  kUnsupportedTextureFormat,
+  kCount
 };
 
 } // namespace flurr

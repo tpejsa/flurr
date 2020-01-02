@@ -87,18 +87,19 @@ Status FlurrRenderer::update(float a_deltaTime)
   return onUpdate(a_deltaTime);
 }
 
-FlurrHandle FlurrRenderer::createShaderProgram()
+Status FlurrRenderer::createShaderProgram(FlurrHandle& a_programHandle)
 {
   if (!m_initialized)
   {
     FLURR_LOG_WARN("flurr renderer not initialized!");
-    return INVALID_HANDLE;
+    return Status::kNotInitialized;
   }
 
   // Create ShaderProgram instance
-  FlurrHandle programHandle = m_nextShaderProgramHandle++;
-  m_shaderPrograms.emplace(programHandle, std::unique_ptr<ShaderProgram>(onCreateShaderProgram(programHandle)));
-  return programHandle;
+  a_programHandle = m_nextShaderProgramHandle++;
+  m_shaderPrograms.emplace(a_programHandle, std::unique_ptr<ShaderProgram>(onCreateShaderProgram(a_programHandle)));
+
+  return Status::kSuccess;
 }
 
 bool FlurrRenderer::hasShaderProgram(FlurrHandle a_programHandle) const
@@ -191,20 +192,108 @@ Status FlurrRenderer::useShaderProgram(FlurrHandle a_programHandle)
   return shaderProgram->useProgram();
 }
 
-FlurrHandle FlurrRenderer::createVertexBuffer()
+Status FlurrRenderer::createTexture(FlurrHandle& a_texHandle, FlurrHandle a_texResourceHandle, TextureWrapMode a_texWrapMode, TextureMinFilterMode a_texMinFilterMode, TextureMagFilterMode a_texMagFilterMode)
 {
   if (!m_initialized)
   {
     FLURR_LOG_WARN("flurr renderer not initialized!");
-    return INVALID_HANDLE;
+    return Status::kNotInitialized;
+  }
+
+  // Create Texture instance
+  a_texHandle = m_nextTextureHandle++;
+  auto* texture = onCreateTexture(a_texHandle);
+  m_textures.emplace(a_texHandle, std::unique_ptr<Texture>(texture));
+
+  // Initialize texture with data
+  return texture->initTexture(a_texResourceHandle, a_texWrapMode, a_texMinFilterMode, a_texMagFilterMode);
+}
+
+bool FlurrRenderer::hasTexture(FlurrHandle a_texHandle) const
+{
+  return m_textures.find(a_texHandle) != m_textures.end();
+}
+
+Texture* FlurrRenderer::getTexture(FlurrHandle a_texHandle) const
+{
+  auto&& texIt = m_textures.find(a_texHandle);
+  return m_textures.end() == texIt ? nullptr : texIt->second.get();
+}
+
+void FlurrRenderer::destroyTexture(FlurrHandle a_texHandle)
+{
+  if (!m_initialized)
+  {
+    FLURR_LOG_WARN("flurr renderer not initialized!");
+    return;
+  }
+
+  // Get Texture object
+  auto* texture = getTexture(a_texHandle);
+  if (!texture)
+  {
+    FLURR_LOG_WARN("No Texture with handle %u!", a_texHandle);
+    return;
+  }
+
+  // Destroy vertex buffer
+  if (INVALID_HANDLE != texture->getResourceHandle())
+    texture->destroyTexture();
+  m_textures.erase(a_texHandle);
+}
+
+Status FlurrRenderer::useTexture(FlurrHandle a_texHandle, TextureUnitIndex a_texUnit)
+{
+  if (!m_initialized)
+  {
+    FLURR_LOG_WARN("flurr renderer not initialized!");
+    return Status::kInvalidState;
+  }
+
+  // Get Texture object
+  auto* texture = getTexture(a_texHandle);
+  if (!texture)
+  {
+    FLURR_LOG_WARN("No Texture with handle %u!", a_texHandle);
+    return Status::kInvalidArgument;
+  }
+
+  // Use as current texture
+  return texture->useTexture(a_texUnit);
+}
+
+Status FlurrRenderer::createVertexBuffer(FlurrHandle& a_bufferHandle, VertexBufferType a_bufferType, std::size_t a_dataSize, void* a_data, std::size_t a_attributeSize, VertexDataUsage a_dataUsage)
+{
+  if (!m_initialized)
+  {
+    FLURR_LOG_WARN("flurr renderer not initialized!");
+    return Status::kNotInitialized;
   }
 
   // Create VertexBuffer instance
-  FlurrHandle bufferHandle = m_nextVertexBufferHandle++;
-  auto* vertexBuffer = onCreateVertexBuffer(bufferHandle);
-  m_vertexBuffers.emplace(bufferHandle, std::unique_ptr<VertexBuffer>(vertexBuffer));
+  a_bufferHandle = m_nextVertexBufferHandle++;
+  auto* vertexBuffer = onCreateVertexBuffer(a_bufferHandle);
+  m_vertexBuffers.emplace(a_bufferHandle, std::unique_ptr<VertexBuffer>(vertexBuffer));
 
-  return bufferHandle;
+  // Initialize vertex buffer with data
+  return vertexBuffer->initBuffer(a_bufferType, a_dataSize, a_data, a_attributeSize, a_dataUsage);
+}
+
+Status FlurrRenderer::createIndexBuffer(FlurrHandle& a_bufferHandle, std::size_t a_dataSize, void* a_data, VertexDataUsage a_dataUsage)
+{
+  if (!m_initialized)
+  {
+    FLURR_LOG_WARN("flurr renderer not initialized!");
+    return Status::kNotInitialized;
+  }
+
+  // Create VertexBuffer instance
+  a_bufferHandle = m_nextVertexBufferHandle++;
+  auto* vertexBuffer = onCreateVertexBuffer(a_bufferHandle);
+  m_vertexBuffers.emplace(a_bufferHandle, std::unique_ptr<VertexBuffer>(vertexBuffer));
+
+  // Initialize index buffer with data
+  return vertexBuffer->initIndexBuffer(a_dataSize, a_data, a_dataUsage);
 }
 
 bool FlurrRenderer::hasVertexBuffer(FlurrHandle a_bufferHandle) const
@@ -215,8 +304,7 @@ bool FlurrRenderer::hasVertexBuffer(FlurrHandle a_bufferHandle) const
 VertexBuffer* FlurrRenderer::getVertexBuffer(FlurrHandle a_bufferHandle) const
 {
   auto&& bufferIt = m_vertexBuffers.find(a_bufferHandle);
-  return m_vertexBuffers.end() == bufferIt ?
-    nullptr : bufferIt->second.get();
+  return m_vertexBuffers.end() == bufferIt ? nullptr : bufferIt->second.get();
 }
 
 void FlurrRenderer::destroyVertexBuffer(FlurrHandle a_bufferHandle)
@@ -235,47 +323,10 @@ void FlurrRenderer::destroyVertexBuffer(FlurrHandle a_bufferHandle)
     return;
   }
 
+  // Destroy vertex buffer
   if (vertexBuffer->getData())
     vertexBuffer->destroyBuffer();
   m_vertexBuffers.erase(a_bufferHandle);
-}
-
-Status FlurrRenderer::initVertexBuffer(FlurrHandle a_bufferHandle, VertexBufferType a_bufferType, std::size_t a_dataSize, void* a_data, std::size_t a_attributeSize, VertexDataUsage a_dataUsage)
-{
-  if (!m_initialized)
-  {
-    FLURR_LOG_WARN("flurr renderer not initialized!");
-    return Status::kInvalidState;
-  }
-
-  // Get VertexBuffer object
-  auto* vertexBuffer = getVertexBuffer(a_bufferHandle);
-  if (!vertexBuffer)
-  {
-    FLURR_LOG_WARN("No VertexBuffer with handle %u!", a_bufferHandle);
-    return Status::kInvalidArgument;
-  }
-
-  return vertexBuffer->initBuffer(a_bufferType, a_dataSize, a_data, a_attributeSize, a_dataUsage);
-}
-
-Status FlurrRenderer::initIndexBuffer(FlurrHandle a_bufferHandle, std::size_t a_dataSize, void* a_data, VertexDataUsage a_dataUsage)
-{
-  if (!m_initialized)
-  {
-    FLURR_LOG_WARN("flurr renderer not initialized!");
-    return Status::kInvalidState;
-  }
-
-  // Get VertexBuffer object
-  auto* vertexBuffer = getVertexBuffer(a_bufferHandle);
-  if (!vertexBuffer)
-  {
-    FLURR_LOG_WARN("No VertexBuffer with handle %u!", a_bufferHandle);
-    return Status::kInvalidArgument;
-  }
-
-  return vertexBuffer->initIndexBuffer(a_dataSize, a_data, a_dataUsage);
 }
 
 Status FlurrRenderer::useVertexBuffer(FlurrHandle a_bufferHandle)
@@ -294,21 +345,36 @@ Status FlurrRenderer::useVertexBuffer(FlurrHandle a_bufferHandle)
     return Status::kInvalidArgument;
   }
 
+  // Use as current vertex buffer
   return vertexBuffer->useBuffer();
 }
 
-FlurrHandle FlurrRenderer::createVertexArray()
+Status FlurrRenderer::createVertexArray(FlurrHandle& a_arrayHandle, const std::vector<FlurrHandle>& a_attributeBufferHandles, FlurrHandle a_indexBufferHandle)
 {
   if (!m_initialized)
   {
     FLURR_LOG_WARN("flurr renderer not initialized!");
-    return INVALID_HANDLE;
+    return Status::kNotInitialized;
   }
 
   // Create VertexArray instance
-  FlurrHandle arrayHandle = m_nextVertexArrayHandle++;
-  m_vertexArrays.emplace(arrayHandle, std::unique_ptr<VertexArray>(onCreateVertexArray(arrayHandle)));
-  return arrayHandle;
+  a_arrayHandle = m_nextVertexArrayHandle++;
+  auto* vertexArray = onCreateVertexArray(a_arrayHandle);
+  m_vertexArrays.emplace(a_arrayHandle, std::unique_ptr<VertexArray>(vertexArray));
+
+  // Add attribute buffers to the vertex array
+  Status result;
+  for (auto attributeBufferHandle : a_attributeBufferHandles)
+  {
+    result = vertexArray->addAttributeBuffer(attributeBufferHandle);
+    if (Status::kSuccess != result)
+      return result;
+  }
+  result = vertexArray->setIndexBuffer(a_indexBufferHandle);
+  if (Status::kSuccess != result)
+    return result;
+
+  return vertexArray->initArray();
 }
 
 bool FlurrRenderer::hasVertexArray(FlurrHandle a_arrayHandle) const
@@ -339,40 +405,10 @@ void FlurrRenderer::destroyVertexArray(FlurrHandle a_arrayHandle)
     return;
   }
 
+  // Destroy vertex array
   if (vertexArray->isArrayInitialized())
     vertexArray->destroyArray();
   m_vertexArrays.erase(a_arrayHandle);
-}
-
-Status FlurrRenderer::initVertexArray(FlurrHandle a_arrayHandle, const std::vector<FlurrHandle>& a_attributeBufferHandles, FlurrHandle a_indexBufferHandle)
-{
-  if (!m_initialized)
-  {
-    FLURR_LOG_WARN("flurr renderer not initialized!");
-    return Status::kInvalidState;
-  }
-
-  // Get VertexArray object
-  auto* vertexArray = getVertexArray(a_arrayHandle);
-  if (!vertexArray)
-  {
-    FLURR_LOG_WARN("No VertexArray with handle %u!", a_arrayHandle);
-    return Status::kInvalidArgument;
-  }
-
-  // Add attribute buffers to the vertex array
-  Status result;
-  for (auto attributeBufferHandle : a_attributeBufferHandles)
-  {
-    result = vertexArray->addAttributeBuffer(attributeBufferHandle);
-    if (Status::kSuccess != result)
-      return result;
-  }
-  result = vertexArray->setIndexBuffer(a_indexBufferHandle);
-  if (Status::kSuccess != result)
-    return result;
-
-  return vertexArray->initArray();
 }
 
 Status FlurrRenderer::drawVertexArray(FlurrHandle a_arrayHandle)
@@ -391,6 +427,7 @@ Status FlurrRenderer::drawVertexArray(FlurrHandle a_arrayHandle)
     return Status::kInvalidArgument;
   }
 
+  // Draw vertex array
   return vertexArray->drawArray();
 }
 

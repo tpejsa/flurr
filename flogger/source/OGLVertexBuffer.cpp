@@ -49,7 +49,7 @@ Status OGLVertexBuffer::onInitBuffer()
     }
   }
 
-  // Create OGL buffer
+  // Create OGL buffer and fill it with data
   glGenBuffers(1, &m_oglVboId);
   glBindBuffer(oglBufferType, m_oglVboId);
   glBufferData(oglBufferType, getDataSize(), getData(), oglDataUsage);
@@ -65,10 +65,8 @@ void OGLVertexBuffer::onDestroyBuffer()
 
 Status OGLVertexBuffer::onUseBuffer()
 {
-  // Determine OGL buffer type
   GLenum oglBufferType = getBufferType() == VertexBufferType::kVertexAttribute ?
     GL_ARRAY_BUFFER : GL_ELEMENT_ARRAY_BUFFER;
-
   glBindBuffer(oglBufferType, m_oglVboId);
 
   return Status::kSuccess;

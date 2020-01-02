@@ -260,15 +260,16 @@ TEST_F(FlurrTest, FlurrResourceManager)
   FlurrHandle shaderResourceHandle1 = INVALID_HANDLE;
   FlurrHandle shaderResourceHandle2 = INVALID_HANDLE;
   FlurrHandle shaderResourceHandle3 = INVALID_HANDLE;
-  EXPECT_TRUE(resourceManager->createResource(ResourceType::kShader, kShaderPath1, shaderResourceHandle1)
+  EXPECT_TRUE(resourceManager->createResource(shaderResourceHandle1, ResourceType::kShader, kShaderPath1)
     == Status::kSuccess);
-  EXPECT_TRUE(resourceManager->createResource(ResourceType::kShader, kShaderPath2, shaderResourceHandle2)
+  EXPECT_TRUE(resourceManager->createResource(shaderResourceHandle2, ResourceType::kShader, kShaderPath2)
     == Status::kSuccess);
-  EXPECT_TRUE(resourceManager->createResource(ResourceType::kShader, kShaderPath3, shaderResourceHandle3)
+  EXPECT_TRUE(resourceManager->createResource(shaderResourceHandle3, ResourceType::kShader, kShaderPath3)
     == Status::kResourceFileNotFound);
   EXPECT_TRUE(shaderResourceHandle1 != INVALID_HANDLE);
   EXPECT_TRUE(shaderResourceHandle3 == INVALID_HANDLE);
   EXPECT_TRUE(resourceManager->hasResource(shaderResourceHandle1));
+  auto&& resourceLock = resourceManager->lockResources();
   auto* shaderResource1 = resourceManager->getResource(shaderResourceHandle1);
   auto* shaderResource2 = resourceManager->getResource(shaderResourceHandle2);
   ASSERT_TRUE(shaderResource1);
@@ -278,6 +279,7 @@ TEST_F(FlurrTest, FlurrResourceManager)
   EXPECT_TRUE(shaderResource1->getResourcePath() == kShaderPath1);
   EXPECT_TRUE(shaderResource1->getResourceFullPath() == ("./" + kShaderPath1));
   EXPECT_TRUE(shaderResource1->getResourceState() == ResourceState::kCreated);
+  resourceLock.unlock();
 
   // Test resource loading
   TestResourceListener testListener;
@@ -294,8 +296,12 @@ TEST_F(FlurrTest, FlurrResourceManager)
   EXPECT_TRUE(testListener.getOperationResult(shaderResourceHandle1).status == Status::kSuccess);
   EXPECT_TRUE(testListener.getOperationResult(shaderResourceHandle2).resourceHandle == shaderResourceHandle2);
   EXPECT_TRUE(testListener.getOperationResult(shaderResourceHandle2).status == Status::kSuccess);
+  resourceLock.lock();
+  shaderResource1 = resourceManager->getResource(shaderResourceHandle1);
+  shaderResource2 = resourceManager->getResource(shaderResourceHandle2);
   EXPECT_TRUE(shaderResource1->getResourceState() == ResourceState::kLoaded);
   EXPECT_TRUE(shaderResource2->getResourceState() == ResourceState::kLoaded);
+  resourceLock.unlock();
 
   // Test resource unloading
   std::this_thread::sleep_for(std::chrono::milliseconds(kUpdateTimeMSec));
@@ -308,15 +314,23 @@ TEST_F(FlurrTest, FlurrResourceManager)
   EXPECT_TRUE(testListener.getOperationResult(shaderResourceHandle1).status == Status::kSuccess);
   EXPECT_TRUE(testListener.getOperationResult(shaderResourceHandle2).resourceHandle == shaderResourceHandle2);
   EXPECT_TRUE(testListener.getOperationResult(shaderResourceHandle2).status == Status::kSuccess);
+  resourceLock.lock();
+  shaderResource1 = resourceManager->getResource(shaderResourceHandle1);
+  shaderResource2 = resourceManager->getResource(shaderResourceHandle2);
   EXPECT_TRUE(shaderResource1->getResourceState() == ResourceState::kCreated);
   EXPECT_TRUE(shaderResource2->getResourceState() == ResourceState::kCreated);
+  resourceLock.unlock();
   std::this_thread::sleep_for(std::chrono::milliseconds(kUpdateTimeMSec));
   FlurrCore::Get().update(kUpdateTimeSec);
   EXPECT_TRUE(Status::kSuccess == resourceManager->loadResource(shaderResourceHandle1));
   std::this_thread::sleep_for(std::chrono::milliseconds(kUpdateTimeMSec*10));
   FlurrCore::Get().update(kUpdateTimeSec*10);
+  resourceLock.lock();
+  shaderResource1 = resourceManager->getResource(shaderResourceHandle1);
+  shaderResource2 = resourceManager->getResource(shaderResourceHandle2);
   EXPECT_TRUE(shaderResource1->getResourceState() == ResourceState::kLoaded);
   EXPECT_TRUE(shaderResource2->getResourceState() == ResourceState::kCreated);
+  resourceLock.unlock();
 
   // Test resource destroying
   std::this_thread::sleep_for(std::chrono::milliseconds(kUpdateTimeMSec));
@@ -330,7 +344,7 @@ TEST_F(FlurrTest, FlurrResourceManager)
   EXPECT_FALSE(resourceManager->hasResource(shaderResourceHandle1));
 
   // Test shutdown
-  EXPECT_TRUE(resourceManager->createResource(ResourceType::kShader, kShaderPath1, shaderResourceHandle1)
+  EXPECT_TRUE(resourceManager->createResource(shaderResourceHandle1, ResourceType::kShader, kShaderPath1)
     == Status::kSuccess);
   FlurrCore::Get().shutdown();
   EXPECT_FALSE(resourceManager->hasResource(shaderResourceHandle1));
@@ -347,7 +361,7 @@ TEST_F(FlurrTest, FlurrTextureResources)
   // Test texture creation
   static const std::string kTexPath = "resources/common/textures/Checkers.png";
   FlurrHandle texResourceHandle = INVALID_HANDLE;
-  EXPECT_TRUE(resourceManager->createResource(ResourceType::kTexture, kTexPath, texResourceHandle)
+  EXPECT_TRUE(resourceManager->createResource(texResourceHandle, ResourceType::kTexture, kTexPath)
     == Status::kSuccess);
   EXPECT_TRUE(texResourceHandle != INVALID_HANDLE);
   auto* texResource = static_cast<TextureResource*>(resourceManager->getResource(texResourceHandle));

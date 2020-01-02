@@ -2,7 +2,6 @@
 
 #include "flurr/FlurrDefines.h"
 
-#include <atomic>
 #include <mutex>
 #include <string>
 
@@ -50,7 +49,6 @@ public:
   std::string getResourceFullPath() const;
   ResourceManager* getOwningManager() const { return m_owningManager; }
   ResourceState getResourceState() const { return m_resourceState; }
-  std::unique_lock<std::mutex> lockResource() { return std::unique_lock<std::mutex>(m_resourceMutex); }
 
 private:
 
@@ -64,9 +62,7 @@ private:
   std::string m_resourcePath;
   std::size_t m_resourceDirectoryIndex;
   ResourceManager* m_owningManager;
-  std::atomic<ResourceState> m_resourceState;
-
-  std::mutex m_resourceMutex;
+  ResourceState m_resourceState;
 };
 
 } // namespace flurr

@@ -77,7 +77,7 @@ void ResourceManager::updateListeners()
   }
 }
 
-Status ResourceManager::createResource(ResourceType a_resourceType, const std::string& a_resourcePath, FlurrHandle& a_resourceHandle)
+Status ResourceManager::createResource(FlurrHandle& a_resourceHandle, ResourceType a_resourceType, const std::string& a_resourcePath)
 {
   a_resourceHandle = INVALID_HANDLE; // in case resource creation fails
 
@@ -175,19 +175,15 @@ Status ResourceManager::destroyResource(FlurrHandle a_resourceHandle)
   if (resource)
   {
     // Mark resource as Destroying to prevent it from getting loaded/unloaded on another thread
-    auto&& resourceLock = resource->lockResource();
     const bool mustUnload = resource->getResourceState() == ResourceState::kLoaded;
     resource->setResourceState(ResourceState::kDestroying);
-    allResourcesLock.unlock(); // this is OK, resource can't get destroyed while locked
 
     // Unload the resource
     if (mustUnload)
       resource->onUnload();
     resource->onDestroy(); // destroy any child resources
-    resourceLock.unlock();
 
     // Destroy the resource
-    allResourcesLock.lock();
     const std::string resourcePath = resource->getResourcePath();
     m_resourceHandlesByPath.erase(resourcePath);
     m_resources.erase(a_resourceHandle);
@@ -243,9 +239,22 @@ bool ResourceManager::hasResource(const std::string& a_resourcePath) const
   return resourceHandleIt != m_resourceHandlesByPath.end();
 }
 
+std::unique_lock<std::mutex> ResourceManager::acquireResource(Resource** a_resource, FlurrHandle a_resourceHandle)
+{
+  std::unique_lock<std::mutex> resourceLock(m_resourceMutex);
+  *a_resource = getResource(a_resourceHandle);
+  return resourceLock;
+}
+
+std::unique_lock<std::mutex> ResourceManager::acquireResource(Resource** a_resource, const std::string& a_resourcePath)
+{
+  std::unique_lock<std::mutex> resourceLock(m_resourceMutex);
+  *a_resource = getResource(a_resourcePath);
+  return resourceLock;
+}
+
 Resource* ResourceManager::getResource(FlurrHandle a_resourceHandle) const
 {
-  std::lock_guard<std::mutex> resourceLock(m_resourceMutex);
   const auto&& resourceIt = m_resources.find(a_resourceHandle);
   return (resourceIt != m_resources.end()) ?
     resourceIt->second.get() :
@@ -254,7 +263,6 @@ Resource* ResourceManager::getResource(FlurrHandle a_resourceHandle) const
 
 Resource* ResourceManager::getResource(const std::string& a_resourcePath) const
 {
-  std::lock_guard<std::mutex> resourceLock(m_resourceMutex);
   const auto&& resourceHandleIt = m_resourceHandlesByPath.find(a_resourcePath);
   return (resourceHandleIt != m_resourceHandlesByPath.end()) ?
     m_resources.find(resourceHandleIt->second)->second.get() :
@@ -432,7 +440,6 @@ ResourceOperationResult ResourceManager::executeLoadResource(FlurrHandle a_resou
   Resource* resource = resourceIt != m_resources.end() ? resourceIt->second.get() : nullptr;
   if (resource)
   {
-    auto&& resourceLock = resource->lockResource();
     if (resource->getResourceState() == ResourceState::kLoaded)
     {
       FLURR_LOG_ERROR("Unable to load resource %s; resource already loaded or loading!", resource->getResourcePath().c_str());
@@ -481,7 +488,6 @@ ResourceOperationResult ResourceManager::executeUnloadResource(FlurrHandle a_res
   Resource* resource = resourceIt != m_resources.end() ? resourceIt->second.get() : nullptr;
   if (resource)
   {
-    auto&& resourceLock = resource->lockResource();
     if (resource->getResourceState() == ResourceState::kCreated)
     {
       FLURR_LOG_ERROR("Unable to unload resource %s; resource not loaded!", resource->getResourcePath().c_str());
@@ -496,11 +502,10 @@ ResourceOperationResult ResourceManager::executeUnloadResource(FlurrHandle a_res
     {
       // Unload the resource
       resource->setResourceState(ResourceState::kUnloading);
-      allResourcesLock.unlock(); // this is OK, resource can't get destroyed while locked
-      operationResult.status = Status::kSuccess;
       resource->onUnload();
       resource->setResourceState(ResourceState::kCreated);
-      resourceLock.unlock();
+      allResourcesLock.unlock();
+      operationResult.status = Status::kSuccess;
     }
   }
   else

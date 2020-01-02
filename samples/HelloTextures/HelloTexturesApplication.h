@@ -26,34 +26,34 @@ private:
 
   // Quad 1 definition
   static constexpr const float kPositionData1[] = {
+    -0.75f, 0.0f, 0.0f,
     0.0f, 0.0f, 0.0f,
-    0.25f, -0.75f, 0.0f,
-    -0.75f, -0.75f, 0.0f,
-    -0.75f, 0.25f, 0.0f
+    0.0f, -0.75f, 0.0f,
+    -0.75f, -0.75f, 0.0f
   };
   static constexpr const float kUV0Data1[] = {
-    1.0f, 0.0f,
     0.0f, 1.0f,
-    0.0f, 0.0f,
     1.0f, 1.0f,
+    1.0f, 0.0f,
+    0.0f, 0.0f
   };
   static constexpr const uint32_t kIndexData1[] = {
-    0, 1, 3,
-    1, 2, 3
+    0, 1, 2,
+    0, 2, 3
   };
 
   // Quad 2 definition
   static constexpr const float kPositionData2[] = {
-    0.0f, 0.0f, 0.0f,
-    0.25f, -0.75f, 0.0f,
-    -0.75f, -0.75f, 0.0f,
-    -0.75f, 0.25f, 0.0f
+    0.0f, 0.75f, 0.0f,
+    0.75f, 0.75f, 0.0f,
+    0.75f, 0.0f, 0.0f,
+    0.0f, 0.0f, 0.0f
   };
   static constexpr const float kUV0Data2[] = {
-    1.0f, 0.0f,
     0.0f, 1.0f,
-    0.0f, 0.0f,
     1.0f, 1.0f,
+    1.0f, 0.0f,
+    0.0f, 0.0f
   };
   static constexpr const uint32_t kIndexData2[] = {
     0, 1, 3,
@@ -68,6 +68,8 @@ private:
   // Textures
   FlurrHandle m_tex1ResourceHandle;
   FlurrHandle m_tex2ResourceHandle;
+  FlurrHandle m_tex1Handle;
+  FlurrHandle m_tex2Handle;
 
   // Geometry 1
   FlurrHandle m_vb1PosHandle;

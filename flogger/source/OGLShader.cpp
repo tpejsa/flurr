@@ -32,11 +32,17 @@ Status OGLShader::compile(FlurrHandle a_shaderResourceHandle)
 
   // Get shader resource
   auto* resourceManager = FlurrCore::Get().getResourceManager();
+  auto&& resourceLock = resourceManager->lockResources();
   auto* shaderResource = static_cast<ShaderResource*>(resourceManager->getResource(a_shaderResourceHandle));
   if (!shaderResource)
   {
-    FLURR_LOG_ERROR("Unable to compile shader; shader resource %s does not exist!", shaderResource->getResourcePath().c_str());
-    return Status::kInvalidHandle;
+    FLURR_LOG_ERROR("Unable to compile shader; shader resource %u does not exist!", a_shaderResourceHandle);
+    return Status::kResourceNotCreated;
+  }
+  if (ResourceType::kShader != shaderResource->getResourceType())
+  {
+    FLURR_LOG_ERROR("Unable to compile shader; resource %s is not a shader resource!", shaderResource->getResourcePath().c_str());
+    return Status::kResourceTypeInvalid;
   }
   if (shaderResource->getResourceState() != ResourceState::kLoaded)
   {
@@ -45,7 +51,6 @@ Status OGLShader::compile(FlurrHandle a_shaderResourceHandle)
   }
 
   // Create and compile shader
-  auto&& shaderResourceLock = shaderResource->lockResource();
   const auto& shaderSource = shaderResource->getShaderSource();
   const auto* shaderSourceData = shaderSource.data();
   GLint shaderSourceLength = static_cast<GLint>(shaderSource.length());
@@ -57,7 +62,7 @@ Status OGLShader::compile(FlurrHandle a_shaderResourceHandle)
   }
   glShaderSource(m_oglShaderId, 1, &shaderSourceData, &shaderSourceLength);
   glCompileShader(m_oglShaderId);
-  shaderResourceLock.unlock();
+  resourceLock.unlock();
 
   // Check for compilation errors
   GLint result = 0;

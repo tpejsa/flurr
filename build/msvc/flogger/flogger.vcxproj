@@ -15,10 +15,12 @@
     <ClInclude Include="..\..\..\flogger\include\flogger\OGLRenderer.h" />
     <ClInclude Include="..\..\..\flogger\include\flogger\OGLShader.h" />
     <ClInclude Include="..\..\..\flogger\include\flogger\OGLShaderProgram.h" />
+    <ClInclude Include="..\..\..\flogger\include\flogger\OGLTexture.h" />
     <ClInclude Include="..\..\..\flogger\include\flogger\OGLVertexArray.h" />
     <ClInclude Include="..\..\..\flogger\include\flogger\OGLVertexBuffer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\flogger\source\flogger\OGLTexture.cpp" />
     <ClCompile Include="..\..\..\flogger\source\OGLRenderer.cpp" />
     <ClCompile Include="..\..\..\flogger\source\OGLShader.cpp" />
     <ClCompile Include="..\..\..\flogger\source\OGLShaderProgram.cpp" />

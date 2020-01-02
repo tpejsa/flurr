@@ -1,5 +1,6 @@
 #include "flogger/OGLRenderer.h"
 #include "flogger/OGLShaderProgram.h"
+#include "flogger/OGLTexture.h"
 #include "flogger/OGLVertexBuffer.h"
 #include "flogger/OGLVertexArray.h"
 
@@ -74,6 +75,11 @@ Status FlurrOGLRenderer::onUpdate(float a_deltaTime)
 ShaderProgram* FlurrOGLRenderer::onCreateShaderProgram(FlurrHandle a_programHandle)
 {
   return new OGLShaderProgram(a_programHandle);
+}
+
+Texture* FlurrOGLRenderer::onCreateTexture(FlurrHandle a_texHandle)
+{
+  return new OGLTexture(a_texHandle);
 }
 
 VertexBuffer* FlurrOGLRenderer::onCreateVertexBuffer(FlurrHandle a_bufferHandle)
