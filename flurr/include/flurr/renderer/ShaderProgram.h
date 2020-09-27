@@ -39,13 +39,14 @@ public:
   virtual void destroyProgram();
   virtual Status useProgram();
 
-  virtual bool setFloatValue(const std::string& name, float value) = 0;
-  virtual bool setVec2Value(const std::string& name, const glm::vec2& value) = 0;
-  virtual bool setVec3Value(const std::string& name, const glm::vec3& value) = 0;
-  virtual bool setVec4Value(const std::string& name, const glm::vec4& value) = 0;
-  virtual bool setIntValue(const std::string& name, int value) = 0;
-  virtual bool setUIntValue(const std::string& name, uint32_t value) = 0;
-  virtual bool setBoolValue(const std::string& name, bool value) = 0;
+  virtual bool setFloatValue(const std::string& a_name, float a_value) = 0;
+  virtual bool setVec2Value(const std::string& a_name, const glm::vec2& a_value) = 0;
+  virtual bool setVec3Value(const std::string& a_name, const glm::vec3& a_value) = 0;
+  virtual bool setVec4Value(const std::string& a_name, const glm::vec4& a_value) = 0;
+  virtual bool setMat4Value(const std::string& a_name, const glm::mat4& a_value) = 0;
+  virtual bool setIntValue(const std::string& a_name, int a_value) = 0;
+  virtual bool setUIntValue(const std::string& a_name, uint32_t a_value) = 0;
+  virtual bool setBoolValue(const std::string& a_name, bool a_value) = 0;
 
 private:
 

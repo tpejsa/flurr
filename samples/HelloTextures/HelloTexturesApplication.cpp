@@ -27,7 +27,7 @@ HelloTexturesApplication::HelloTexturesApplication(int a_windowWidth, int a_wind
 bool HelloTexturesApplication::onInit()
 {
   // Load Phong shader resources
-  auto* resourceManager = FlurrCore::Get().getResourceManager();
+  auto* resourceManager = getResourceManager();
   if (Status::kSuccess != resourceManager->createResource(m_vsResourceHandle, ResourceType::kShader, kVSPath))
   {
     FLURR_LOG_ERROR("Failed to create shader resource %s!", kVSPath);

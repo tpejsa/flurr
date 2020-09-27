@@ -1,4 +1,5 @@
 bin/*
+build/msvc/*/x64
 *.exe
 *.dll
 *.lib

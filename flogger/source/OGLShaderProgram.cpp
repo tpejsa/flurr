@@ -2,6 +2,8 @@
 #include "flogger/OGLShader.h"
 #include "flurr/FlurrLog.h"
 
+#include <glm/gtc/type_ptr.hpp>
+
 #include <string>
 
 namespace flurr
@@ -19,63 +21,72 @@ OGLShaderProgram::~OGLShaderProgram()
     glDeleteProgram(m_oglProgramId);
 }
 
-bool OGLShaderProgram::setFloatValue(const std::string& name, float value)
+bool OGLShaderProgram::setFloatValue(const std::string& a_name, float a_value)
 {
-  GLint loc = glGetUniformLocation(m_oglProgramId, name.c_str());
+  GLint loc = glGetUniformLocation(m_oglProgramId, a_name.c_str());
   if (-1 == loc) return false;
 
-  glUniform1f(loc, value);
+  glUniform1f(loc, a_value);
   return true;
 }
 
-bool OGLShaderProgram::setVec2Value(const std::string& name, const glm::vec2& value)
+bool OGLShaderProgram::setVec2Value(const std::string& a_name, const glm::vec2& a_value)
 {
-  GLint loc = glGetUniformLocation(m_oglProgramId, name.c_str());
+  GLint loc = glGetUniformLocation(m_oglProgramId, a_name.c_str());
   if (-1 == loc) return false;
 
-  glUniform2f(loc, value.x, value.y);
+  glUniform2f(loc, a_value.x, a_value.y);
   return true;
 }
 
-bool OGLShaderProgram::setVec3Value(const std::string& name, const glm::vec3& value)
+bool OGLShaderProgram::setVec3Value(const std::string& a_name, const glm::vec3& a_value)
 {
-  GLint loc = glGetUniformLocation(m_oglProgramId, name.c_str());
+  GLint loc = glGetUniformLocation(m_oglProgramId, a_name.c_str());
   if (-1 == loc) return false;
 
-  glUniform3f(loc, value.x, value.y, value.z);
+  glUniform3f(loc, a_value.x, a_value.y, a_value.z);
   return true;
 }
 
-bool OGLShaderProgram::setVec4Value(const std::string& name, const glm::vec4& value)
+bool OGLShaderProgram::setVec4Value(const std::string& a_name, const glm::vec4& a_value)
 {
-  GLint loc = glGetUniformLocation(m_oglProgramId, name.c_str());
+  GLint loc = glGetUniformLocation(m_oglProgramId, a_name.c_str());
   if (-1 == loc) return false;
 
-  glUniform4f(loc, value.x, value.y, value.z, value.w);
+  glUniform4f(loc, a_value.x, a_value.y, a_value.z, a_value.w);
   return true;
 }
 
-bool OGLShaderProgram::setIntValue(const std::string& name, int value)
+bool OGLShaderProgram::setMat4Value(const std::string& a_name, const glm::mat4& a_value)
 {
-  GLint loc = glGetUniformLocation(m_oglProgramId, name.c_str());
+  GLint loc = glGetUniformLocation(m_oglProgramId, a_name.c_str());
   if (-1 == loc) return false;
 
-  glUniform1i(loc, value);
+  glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(a_value));
   return true;
 }
 
-bool OGLShaderProgram::setUIntValue(const std::string& name, uint32_t value)
+bool OGLShaderProgram::setIntValue(const std::string& a_name, int a_value)
 {
-  GLint loc = glGetUniformLocation(m_oglProgramId, name.c_str());
+  GLint loc = glGetUniformLocation(m_oglProgramId, a_name.c_str());
   if (-1 == loc) return false;
 
-  glUniform1ui(loc, value);
+  glUniform1i(loc, a_value);
   return true;
 }
 
-bool OGLShaderProgram::setBoolValue(const std::string& name, bool value)
+bool OGLShaderProgram::setUIntValue(const std::string& a_name, uint32_t a_value)
 {
-  return setIntValue(name, value);
+  GLint loc = glGetUniformLocation(m_oglProgramId, a_name.c_str());
+  if (-1 == loc) return false;
+
+  glUniform1ui(loc, a_value);
+  return true;
+}
+
+bool OGLShaderProgram::setBoolValue(const std::string& a_name, bool a_value)
+{
+  return setIntValue(a_name, a_value);
 }
 
 Shader* OGLShaderProgram::onCreateShader(ShaderType a_shaderType, ShaderProgram* a_owningProgram)

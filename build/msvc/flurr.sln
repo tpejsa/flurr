@@ -23,6 +23,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HelloTriangle", "HelloTrian
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HelloTextures", "HelloTextures\HelloTextures.vcxproj", "{76326129-22EE-4DD4-8927-FB7737D8931F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{63340C04-996C-46E7-9303-090627CE2B00} = {63340C04-996C-46E7-9303-090627CE2B00}
+		{2B575766-DECE-49D3-86C3-CE468805E8E0} = {2B575766-DECE-49D3-86C3-CE468805E8E0}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

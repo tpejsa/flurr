@@ -28,7 +28,7 @@ HelloTriangleApplication::HelloTriangleApplication(int a_windowWidth, int a_wind
 bool HelloTriangleApplication::onInit()
 {
   // Load vertex color shader resources
-  auto* resourceManager = FlurrCore::Get().getResourceManager();
+  auto* resourceManager = getResourceManager();
   if (Status::kSuccess != resourceManager->createResource(m_vs1ResourceHandle, ResourceType::kShader, kVS1Path))
   {
     FLURR_LOG_ERROR("Failed to create shader resource %s!", kVS1Path);
