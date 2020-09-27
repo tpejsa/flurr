@@ -18,6 +18,10 @@
     <ClInclude Include="..\..\..\flurr\include\flurr\resource\Resource.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\resource\ResourceManager.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\resource\ShaderResource.h" />
+    <ClInclude Include="..\..\..\flurr\include\flurr\scene\CameraComponent.h" />
+    <ClInclude Include="..\..\..\flurr\include\flurr\scene\Node.h" />
+    <ClInclude Include="..\..\..\flurr\include\flurr\scene\NodeComponent.h" />
+    <ClInclude Include="..\..\..\flurr\include\flurr\scene\SceneManager.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\utils\ConfigFile.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\FlurrCore.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\FlurrDefines.h" />
@@ -39,11 +43,15 @@
     <ClInclude Include="..\..\..\flurr\source\stbi\stb_image_aug.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\flurr\source\scene\CameraComponent.cpp" />
+    <ClCompile Include="..\..\..\flurr\source\scene\Node.cpp" />
+    <ClCompile Include="..\..\..\flurr\source\scene\NodeComponent.cpp" />
     <ClCompile Include="..\..\..\flurr\source\renderer\Texture.cpp" />
     <ClCompile Include="..\..\..\flurr\source\resource\Resource.cpp" />
     <ClCompile Include="..\..\..\flurr\source\resource\ResourceManager.cpp" />
     <ClCompile Include="..\..\..\flurr\source\resource\ShaderResource.cpp" />
     <ClCompile Include="..\..\..\flurr\source\resource\TextureResource.cpp" />
+    <ClCompile Include="..\..\..\flurr\source\scene\SceneManager.cpp" />
     <ClCompile Include="..\..\..\flurr\source\stbi\image_DXT.c" />
     <ClCompile Include="..\..\..\flurr\source\stbi\image_helper.c" />
     <ClCompile Include="..\..\..\flurr\source\stbi\stb_image_aug.c" />
@@ -63,19 +71,19 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{63340C04-996C-46E7-9303-090627CE2B00}</ProjectGuid>
     <RootNamespace>flurr</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -107,7 +115,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ExceptionHandling>false</ExceptionHandling>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\flurr\include;$(SolutionDir)..\..\flurr\source;$(SolutionDir)..\..\flurr\source\stbi</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\flurr\include;$(SolutionDir)..\..\flurr\source;$(SolutionDir)..\..\flurr\source\stbi;$(GLM_DIR)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>FLURR_DEBUG;_HAS_EXCEPTIONS=0;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -129,7 +137,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ExceptionHandling>false</ExceptionHandling>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\flurr\include;$(SolutionDir)..\..\flurr\source;$(SolutionDir)..\..\flurr\source\stbi</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\flurr\include;$(SolutionDir)..\..\flurr\source;$(SolutionDir)..\..\flurr\source\stbi;$(GLM_DIR)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>

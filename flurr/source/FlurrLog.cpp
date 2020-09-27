@@ -126,6 +126,9 @@ bool FlurrLog::log(const char* a_filePath, int a_line, const char* a_msgType, co
       a_msgType,
       a_msg);
     std::vsnprintf(m_msgBuffer[logLine], kMaxLineSize, m_msgTemp, args);
+    
+    // Also print to stdout
+    std::printf(m_msgBuffer[logLine]);
 
     // Increment log line number
     logLine = logLine < kMsgBufferSize - 1 ? logLine + 1 : 0;

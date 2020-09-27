@@ -7,19 +7,25 @@ namespace flurr
 
 FlurrCore::FlurrCore()
   : m_initialized(false),
+  m_sceneManager(std::make_unique<SceneManager>()),
   m_resourceManager(std::make_unique<ResourceManager>())
 {
 }
 
 FlurrCore::~FlurrCore()
 {
-  if (m_initialized)
+  if (isInitialized())
     shutdown();
 }
 
 Status FlurrCore::init(const std::string& a_configPath)
 {
   FLURR_LOG_INFO("Initializing flurr...");
+  if (isInitialized())
+  {
+    FLURR_LOG_WARN("flurr already initialized!");
+    return Status::kSuccess;
+  }
 
   // TODO: load engine config
 
@@ -31,6 +37,14 @@ Status FlurrCore::init(const std::string& a_configPath)
     return Status::kFailed;
   }
 
+  // Initialize scene manager
+  Status result = m_sceneManager->init();
+  if (Status::kSuccess != result)
+  {
+    FLURR_LOG_ERROR("Failed to initialize SceneManager!");
+    return result;
+  }
+
   FLURR_LOG_INFO("flurr initialized.");
   m_initialized = true;
   return Status::kSuccess;
@@ -39,7 +53,7 @@ Status FlurrCore::init(const std::string& a_configPath)
 void FlurrCore::shutdown()
 {
   FLURR_LOG_INFO("Shutting down flurr...");
-  if (!m_initialized)
+  if (!isInitialized())
   {
     FLURR_LOG_WARN("flurr not initialized!");
     return;
@@ -53,6 +67,9 @@ void FlurrCore::shutdown()
     m_renderer = nullptr;
   }
 
+  // Shut down SceneManager
+  m_sceneManager->shutdown();
+
   // Stop ResourceManager
   m_resourceManager->stop();
   m_resourceManager->removeAllResourceDirectories();
@@ -63,7 +80,7 @@ void FlurrCore::shutdown()
 
 Status FlurrCore::update(float a_deltaTime)
 {
-  if (!m_initialized)
+  if (!isInitialized())
   {
     FLURR_LOG_ERROR("flurr not initialized!");
     return Status::kNotInitialized;
@@ -72,8 +89,15 @@ Status FlurrCore::update(float a_deltaTime)
   // Update resource listeners
   m_resourceManager->updateListeners();
 
+  // Update scene
+  Status result = m_sceneManager->update(a_deltaTime);
+  if (Status::kSuccess != result)
+  {
+    FLURR_LOG_ERROR("Failed to update flurr SceneManager!");
+    return result;
+  }
+
   // Update renderer
-  Status result = Status::kSuccess;
   if (m_renderer)
   {
     if (!m_renderer->isInitialized())
@@ -83,12 +107,25 @@ Status FlurrCore::update(float a_deltaTime)
     }
 
     result = m_renderer->update(a_deltaTime);
+    if (Status::kSuccess != result)
+    {
+      FLURR_LOG_ERROR("Failed to update flurr renderer!");
+      return result;
+    }
   }
 
-  return result;
+  // Draw the scene
+  result = m_sceneManager->draw();
+  if (Status::kSuccess != result)
+  {
+    FLURR_LOG_ERROR("Failed to draw the scene!");
+    return result;
+  }
+
+  return Status::kSuccess;
 }
 
-void FlurrCore::setRenderer(FlurrRenderer* a_renderer)
+void FlurrCore::setRenderer(Renderer* a_renderer)
 {
   if (a_renderer)
     FLURR_LOG_INFO("flurr renderer set.");

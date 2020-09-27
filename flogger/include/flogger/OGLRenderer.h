@@ -8,7 +8,7 @@
 namespace flurr
 {
 
-class FLURR_DLL_EXPORT FlurrOGLRenderer : public FlurrRenderer
+class FLURR_DLL_EXPORT FlurrOGLRenderer : public Renderer
 {
 
 private:

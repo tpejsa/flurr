@@ -36,6 +36,7 @@ constexpr TextureUnitIndex MAX_TEXTURE_UNIT = 15;
 
 class FLURR_DLL_EXPORT Texture
 {
+  friend class Renderer;
 
 public:
 
@@ -47,18 +48,20 @@ public:
   virtual ~Texture() = default;
 
   FlurrHandle getTextureHandle() const { return m_texHandle; }
-  FlurrHandle getResourceHandle() const { return m_texResourceHandle; }
-  std::unique_lock<std::mutex> acquireTextureResource(TextureResource** a_texResource) const;
-  TextureResource* getTextureResource() const;
+  FlurrHandle getResourceHandle() const { return m_texResourceHandle; }  
   TextureWrapMode getWrapMode() { return m_texWrapMode; }
   TextureMinFilterMode getMinFilterMode() const { return m_texMinFilterMode; }
   TextureMagFilterMode getMagFilterMode() const { return m_texMagFilterMode; }
-  Status initTexture(FlurrHandle a_texResourceHandle, TextureWrapMode a_texWrapMode = TextureWrapMode::kRepeat, TextureMinFilterMode a_texMinFilterMode = TextureMinFilterMode::kLinearMipmapLinear, TextureMagFilterMode a_texMagFilterMode = TextureMagFilterMode::kLinear);
-  void destroyTexture();
-  Status useTexture(TextureUnitIndex a_texUnit = 0);
+
+protected:
+
+  TextureResource* getTextureResource() const;
 
 private:
 
+  Status initTexture(FlurrHandle a_texResourceHandle, TextureWrapMode a_texWrapMode = TextureWrapMode::kRepeat, TextureMinFilterMode a_texMinFilterMode = TextureMinFilterMode::kLinearMipmapLinear, TextureMagFilterMode a_texMagFilterMode = TextureMagFilterMode::kLinear);
+  void destroyTexture();
+  Status useTexture(TextureUnitIndex a_texUnit = 0);
   virtual Status onInitTexture() = 0;
   virtual void onDestroyTexture() = 0;
   virtual Status onUseTexture(TextureUnitIndex a_texUnit) = 0;

@@ -18,13 +18,14 @@ public:
 
   GLuint getOGLProgramId() const { return m_oglProgramId; }
 
-  bool setFloatValue(const std::string& name, float value) override;
-  bool setVec2Value(const std::string& name, const glm::vec2& value) override;
-  bool setVec3Value(const std::string& name, const glm::vec3& value) override;
-  bool setVec4Value(const std::string& name, const glm::vec4& value) override;
-  bool setIntValue(const std::string& name, int value) override;
-  bool setUIntValue(const std::string& name, uint32_t value) override;
-  bool setBoolValue(const std::string& name, bool value) override;
+  bool setFloatValue(const std::string& a_name, float a_value) override;
+  bool setVec2Value(const std::string& a_name, const glm::vec2& a_value) override;
+  bool setVec3Value(const std::string& a_name, const glm::vec3& a_value) override;
+  bool setVec4Value(const std::string& a_name, const glm::vec4& a_value) override;
+  bool setMat4Value(const std::string& a_name, const glm::mat4& a_value) override;
+  bool setIntValue(const std::string& a_name, int a_value) override;
+  bool setUIntValue(const std::string& a_name, uint32_t a_value) override;
+  bool setBoolValue(const std::string& a_name, bool a_value) override;
 
 private:
 

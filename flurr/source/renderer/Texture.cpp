@@ -14,35 +14,9 @@ Texture::Texture(FlurrHandle a_texHandle)
 {
 }
 
-std::unique_lock<std::mutex> Texture::acquireTextureResource(TextureResource** a_texResource) const
-{
-  // Try to get a pointer to the resource
+TextureResource* Texture::getTextureResource() const {
   auto* resourceManager = FlurrCore::Get().getResourceManager();
-  Resource* resource = nullptr;
-  auto&& resourceLock = resourceManager->acquireResource(&resource, m_texResourceHandle);
-  if (!resource)
-  {
-    FLURR_LOG_ERROR("Texture resource %u does not exist!", m_texResourceHandle);
-    *a_texResource = nullptr;
-    return std::move(resourceLock);
-  }
-
-  // Make sure it's a texture resource
-  if (ResourceType::kTexture != resource->getResourceType())
-  {
-    FLURR_LOG_ERROR("Resource %u is not a texture resource!", m_texResourceHandle);
-    *a_texResource = nullptr;
-    return std::move(resourceLock);
-  }
-
-  *a_texResource = static_cast<TextureResource*>(resource);
-  return std::move(resourceLock);
-}
-
-TextureResource* Texture::getTextureResource() const
-{
-  auto* resourceManager = FlurrCore::Get().getResourceManager();
-  return static_cast<TextureResource*>(resourceManager->getResource(m_texResourceHandle));
+  return static_cast<TextureResource*>(resourceManager->getResource(getResourceHandle()));
 }
 
 Status Texture::initTexture(FlurrHandle a_texResourceHandle, TextureWrapMode a_texWrapMode, TextureMinFilterMode a_texMinFilterMode, TextureMagFilterMode a_texMagFilterMode)
@@ -50,7 +24,7 @@ Status Texture::initTexture(FlurrHandle a_texResourceHandle, TextureWrapMode a_t
   // Ensure we have a valid and loaded texture resource
   auto* resourceManager = FlurrCore::Get().getResourceManager();
   Resource* resource = nullptr;
-  auto&& resourceLock = resourceManager->acquireResource(&resource, a_texResourceHandle);
+  auto resourceLock = resourceManager->lockAndGetResource(&resource, a_texResourceHandle);
   if (!resource)
   {
     FLURR_LOG_ERROR("Unable to initialize texture; texture resource %u does not exist!", a_texResourceHandle);
@@ -66,7 +40,6 @@ Status Texture::initTexture(FlurrHandle a_texResourceHandle, TextureWrapMode a_t
     FLURR_LOG_ERROR("Unable to initialize texture; texture resource %s not loaded!", resource->getResourcePath().c_str());
     return Status::kResourceNotLoaded;
   }
-  TextureResource* texResource = static_cast<TextureResource*>(resource);
 
   // Initialize texture
   m_texResourceHandle = a_texResourceHandle;

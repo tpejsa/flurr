@@ -28,7 +28,7 @@ HelloTriangleApplication::HelloTriangleApplication(int a_windowWidth, int a_wind
 bool HelloTriangleApplication::onInit()
 {
   // Load vertex color shader resources
-  auto* resourceManager = FlurrCore::Get().getResourceManager();
+  auto* resourceManager = getResourceManager();
   if (Status::kSuccess != resourceManager->createResource(m_vs1ResourceHandle, ResourceType::kShader, kVS1Path))
   {
     FLURR_LOG_ERROR("Failed to create shader resource %s!", kVS1Path);
@@ -190,14 +190,23 @@ bool HelloTriangleApplication::onUpdate(float a_deltaTime)
 
 void HelloTriangleApplication::onDraw()
 {
+  // Get active camera
+  auto* sceneManager = FlurrCore::Get().getSceneManager();
+  auto* activeCamera = sceneManager->getActiveCamera();
+
   // Draw geometry 1
   auto* renderer = FlurrCore::Get().getRenderer();
-  renderer->useShaderProgram(m_sp1Handle);
+  renderer->useShaderProgram(m_sp1Handle);  
+  auto* sp1 = renderer->getShaderProgram(m_sp1Handle);
+  sp1->setMat4Value(MODEL_TRANSFORM_UNIFORM_NAME, glm::mat4());
+  activeCamera->applyShaderViewProjectionMatrix(m_sp1Handle);
   renderer->drawVertexArray(m_va1Handle);
 
   // Draw geometry 2
   renderer->useShaderProgram(m_sp2Handle);
   auto* sp2 = renderer->getShaderProgram(m_sp2Handle);
+  sp2->setMat4Value(MODEL_TRANSFORM_UNIFORM_NAME, glm::mat4());
+  activeCamera->applyShaderViewProjectionMatrix(m_sp2Handle);
   const glm::vec4 diffuseColor(
     sin(m_albedoTime*glm::pi<float>()/2.0f)/2.0f + 0.5f,
     sin((m_albedoTime/2.0f + 0.25f)*glm::pi<float>())/2.0f + 0.5f,

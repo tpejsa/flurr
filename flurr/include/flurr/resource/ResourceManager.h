@@ -71,8 +71,8 @@ public:
 
   bool hasResource(FlurrHandle a_resourceHandle) const;
   bool hasResource(const std::string& a_resourcePath) const;
-  std::unique_lock<std::mutex> acquireResource(Resource** a_resource, FlurrHandle a_resourceHandle);
-  std::unique_lock<std::mutex> acquireResource(Resource** a_resource, const std::string& a_resourcePath);
+  std::unique_lock<std::mutex> lockAndGetResource(Resource** a_resource, FlurrHandle a_resourceHandle);
+  std::unique_lock<std::mutex> lockAndGetResource(Resource** a_resource, const std::string& a_resourcePath);
   std::unique_lock<std::mutex> lockResources() { return std::unique_lock<std::mutex>(m_resourceMutex); }
   Resource* getResource(FlurrHandle a_resourceHandle) const; // not thread-safe; call lockResources beforehand
   Resource* getResource(const std::string& a_resourcePath) const; // not thread-safe; call lockResources beforehand

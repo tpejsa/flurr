@@ -3400,7 +3400,7 @@ static float *hdr_load(stbi *s, int *x, int *y, int *comp, int req_comp)
 				while (i < width) {
 					count = get8(s);
 					if (count > 128) {
-						// Run
+						// run
 						value = get8(s);
                   count -= 128;
 						for (z = 0; z < count; ++z)
@@ -3508,7 +3508,7 @@ static stbi_uc *hdr_load_rgbe(stbi *s, int *x, int *y, int *comp, int req_comp)
 				while (i < width) {
 					count = get8(s);
 					if (count > 128) {
-						// Run
+						// run
 						value = get8(s);
                   count -= 128;
 						for (z = 0; z < count; ++z)

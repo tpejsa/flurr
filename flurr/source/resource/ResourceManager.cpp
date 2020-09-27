@@ -239,14 +239,14 @@ bool ResourceManager::hasResource(const std::string& a_resourcePath) const
   return resourceHandleIt != m_resourceHandlesByPath.end();
 }
 
-std::unique_lock<std::mutex> ResourceManager::acquireResource(Resource** a_resource, FlurrHandle a_resourceHandle)
+std::unique_lock<std::mutex> ResourceManager::lockAndGetResource(Resource** a_resource, FlurrHandle a_resourceHandle)
 {
   std::unique_lock<std::mutex> resourceLock(m_resourceMutex);
   *a_resource = getResource(a_resourceHandle);
   return resourceLock;
 }
 
-std::unique_lock<std::mutex> ResourceManager::acquireResource(Resource** a_resource, const std::string& a_resourcePath)
+std::unique_lock<std::mutex> ResourceManager::lockAndGetResource(Resource** a_resource, const std::string& a_resourcePath)
 {
   std::unique_lock<std::mutex> resourceLock(m_resourceMutex);
   *a_resource = getResource(a_resourcePath);

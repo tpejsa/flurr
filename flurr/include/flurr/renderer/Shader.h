@@ -18,22 +18,24 @@ enum class ShaderType : uint8_t
 
 class FLURR_DLL_EXPORT Shader
 {
+  friend class ShaderProgram;
 
 public:
 
   Shader(ShaderType a_shaderType, ShaderProgram* a_owningProgram);
-  Shader(const Shader&) = default;
+  Shader(const Shader&) = delete;
   Shader(Shader&&) = default;
-  Shader& operator=(const Shader&) = default;
+  Shader& operator=(const Shader&) = delete;
   Shader& operator=(Shader&&) = default;
   virtual ~Shader() = default;
 
   ShaderType getShaderType() const { return m_shaderType; }
   ShaderProgram* getOwningProgram() const { return m_owningProgram; }
-  virtual Status compile(FlurrHandle a_shaderResourceHandle) = 0;
-  virtual void destroy() = 0;
 
 private:
+
+  virtual Status compile(FlurrHandle a_shaderResourceHandle) = 0;
+  virtual void destroy() = 0;
 
   ShaderType m_shaderType;
   ShaderProgram* m_owningProgram;
