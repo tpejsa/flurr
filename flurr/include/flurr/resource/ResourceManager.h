@@ -56,7 +56,7 @@ public:
   ResourceManager(ResourceManager&&) = delete;
   ResourceManager& operator=(const ResourceManager&) = delete;
   ResourceManager& operator=(ResourceManager&&) = delete;
-  virtual ~ResourceManager();
+  ~ResourceManager();
 
   bool run();
   bool isRunning() const { return m_running; }

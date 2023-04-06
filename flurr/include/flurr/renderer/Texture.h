@@ -4,6 +4,7 @@
 #include "flurr/resource/TextureResource.h"
 
 #include <glm/glm.hpp>
+#include <GL/glew.h>
 
 #include <mutex>
 
@@ -41,11 +42,11 @@ class FLURR_DLL_EXPORT Texture
 public:
 
   Texture(FlurrHandle a_texHandle);
-  Texture(const Texture&) = default;
+  Texture(const Texture&) = delete;
   Texture(Texture&&) = default;
-  Texture& operator=(const Texture&) = default;
+  Texture& operator=(const Texture&) = delete;
   Texture& operator=(Texture&&) = default;
-  virtual ~Texture() = default;
+  ~Texture() = default;
 
   FlurrHandle getTextureHandle() const { return m_texHandle; }
   FlurrHandle getResourceHandle() const { return m_texResourceHandle; }  
@@ -53,24 +54,23 @@ public:
   TextureMinFilterMode getMinFilterMode() const { return m_texMinFilterMode; }
   TextureMagFilterMode getMagFilterMode() const { return m_texMagFilterMode; }
 
-protected:
-
-  TextureResource* getTextureResource() const;
-
 private:
 
   Status initTexture(FlurrHandle a_texResourceHandle, TextureWrapMode a_texWrapMode = TextureWrapMode::kRepeat, TextureMinFilterMode a_texMinFilterMode = TextureMinFilterMode::kLinearMipmapLinear, TextureMagFilterMode a_texMagFilterMode = TextureMagFilterMode::kLinear);
   void destroyTexture();
   Status useTexture(TextureUnitIndex a_texUnit = 0);
-  virtual Status onInitTexture() = 0;
-  virtual void onDestroyTexture() = 0;
-  virtual Status onUseTexture(TextureUnitIndex a_texUnit) = 0;
+  bool getOGLTextureFormat(TextureFormat a_texFormat, GLint& a_oglInternalTexFormat, GLint& a_oglTexFormat) const;
+  GLint getOGLTextureWrapMode(TextureWrapMode a_texWrapMode) const;
+  GLint getOGLTextureMinFilterMode(TextureMinFilterMode a_texMinFilterMode) const;
+  GLint getOGLTextureMagFilterMode(TextureMagFilterMode a_texMagFilterMode) const;
 
   FlurrHandle m_texHandle;
   FlurrHandle m_texResourceHandle;
   TextureWrapMode m_texWrapMode;
   TextureMinFilterMode m_texMinFilterMode;
   TextureMagFilterMode m_texMagFilterMode;
+
+  GLuint m_oglTexId;
 };
 
 } // namespace flurr

@@ -28,7 +28,7 @@
     <ClInclude Include="..\..\..\flurr\include\flurr\FlurrLog.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\renderer\Renderer.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\renderer\Shader.h" />
-    <ClInclude Include="..\..\..\flurr\include\flurr\renderer\VertexArray.h" />
+    <ClInclude Include="..\..\..\flurr\include\flurr\renderer\IndexedGeometry.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\renderer\VertexBuffer.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\utils\FileUtils.h" />
     <ClInclude Include="..\..\..\flurr\include\flurr\utils\MathUtils.h" />
@@ -61,11 +61,20 @@
     <ClCompile Include="..\..\..\flurr\source\renderer\Renderer.cpp" />
     <ClCompile Include="..\..\..\flurr\source\renderer\Shader.cpp" />
     <ClCompile Include="..\..\..\flurr\source\renderer\ShaderProgram.cpp" />
-    <ClCompile Include="..\..\..\flurr\source\renderer\VertexArray.cpp" />
+    <ClCompile Include="..\..\..\flurr\source\renderer\IndexedGeometry.cpp" />
     <ClCompile Include="..\..\..\flurr\source\renderer\VertexBuffer.cpp" />
     <ClCompile Include="..\..\..\flurr\source\utils\FileUtils.cpp" />
     <ClCompile Include="..\..\..\flurr\source\utils\StringUtils.cpp" />
     <ClCompile Include="..\..\..\flurr\source\utils\TimeUtils.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\flurr\resources\textures\Checkers.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\flurr\resources\shaders\LitPhong.frag" />
+    <None Include="..\..\..\flurr\resources\shaders\LitPhong.vert" />
+    <None Include="..\..\..\flurr\resources\shaders\UnlitVertexColored.frag" />
+    <None Include="..\..\..\flurr\resources\shaders\UnlitVertexColored.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -109,13 +118,16 @@
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
+  <PropertyGroup>
+    <DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ExceptionHandling>false</ExceptionHandling>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\flurr\include;$(SolutionDir)..\..\flurr\source;$(SolutionDir)..\..\flurr\source\stbi;$(GLM_DIR)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\flurr\include;$(SolutionDir)..\..\flurr\source;$(SolutionDir)..\..\flurr\source\stbi;$(GLM_DIR);$(GLEW_DIR)\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>FLURR_DEBUG;_HAS_EXCEPTIONS=0;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -123,11 +135,15 @@
     </ClCompile>
     <Link>
       <OutputFile>$(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary>$(SolutionDir)..\..\lib\$(Platform)\$(ConfigurationName)\$(TargetName).lib</ImportLibrary>
-      <AdditionalLibraryDirectories>
-      </AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(GLEW_DIR)\lib\Release\$(Platform)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>rd /s /q $(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\resources
+md $(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\resources\common
+xcopy $(SolutionDir)..\..\flurr\resources\*.* $(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\resources\common /c /e /i /q /r /s /y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -137,7 +153,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ExceptionHandling>false</ExceptionHandling>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\flurr\include;$(SolutionDir)..\..\flurr\source;$(SolutionDir)..\..\flurr\source\stbi;$(GLM_DIR)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\flurr\include;$(SolutionDir)..\..\flurr\source;$(SolutionDir)..\..\flurr\source\stbi;$(GLM_DIR);$(GLEW_DIR)\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -147,11 +163,15 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <OutputFile>$(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary>$(SolutionDir)..\..\lib\$(Platform)\$(ConfigurationName)\$(TargetName).lib</ImportLibrary>
-      <AdditionalLibraryDirectories>
-      </AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(GLEW_DIR)\lib\Release\$(Platform)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>rd /s /q $(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\resources
+md $(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\resources\common
+xcopy $(SolutionDir)..\..\flurr\resources\*.* $(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\resources\common /c /e /i /q /r /s /y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

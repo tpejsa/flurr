@@ -153,18 +153,6 @@ bool FlurrApplication::initFlurr()
     return false;
   }
 
-  // Initialize flurr renderer
-  FLURR_LOG_INFO("Initializing flurr renderer...");
-  auto& flurrRenderer = FlurrOGLRenderer::Get();
-  flurrStatus = flurrRenderer.init();
-  if (flurrStatus != Status::kSuccess)
-  {
-    FLURR_LOG_ERROR("flurr renderer initialization failed (error: %u)!", FromEnum(flurrStatus));
-    flurrCore.shutdown();
-    glfwTerminate();
-    return false;
-  }
-
   return true;
 }
 

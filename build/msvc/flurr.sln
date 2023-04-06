@@ -1,17 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26730.16
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "flurr", "flurr\flurr.vcxproj", "{63340C04-996C-46E7-9303-090627CE2B00}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FlurrUnitTests", "FlurrUnitTests\FlurrUnitTests.vcxproj", "{A450EC64-CD04-4389-8E10-F82CB016782E}"
-	ProjectSection(ProjectDependencies) = postProject
-		{63340C04-996C-46E7-9303-090627CE2B00} = {63340C04-996C-46E7-9303-090627CE2B00}
-		{2B575766-DECE-49D3-86C3-CE468805E8E0} = {2B575766-DECE-49D3-86C3-CE468805E8E0}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "flogger", "flogger\flogger.vcxproj", "{2B575766-DECE-49D3-86C3-CE468805E8E0}"
 	ProjectSection(ProjectDependencies) = postProject
 		{63340C04-996C-46E7-9303-090627CE2B00} = {63340C04-996C-46E7-9303-090627CE2B00}
 	EndProjectSection
@@ -19,13 +13,11 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HelloTriangle", "HelloTriangle\HelloTriangle.vcxproj", "{95572FE2-0752-4CCE-A705-2111064FD89C}"
 	ProjectSection(ProjectDependencies) = postProject
 		{63340C04-996C-46E7-9303-090627CE2B00} = {63340C04-996C-46E7-9303-090627CE2B00}
-		{2B575766-DECE-49D3-86C3-CE468805E8E0} = {2B575766-DECE-49D3-86C3-CE468805E8E0}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HelloTextures", "HelloTextures\HelloTextures.vcxproj", "{76326129-22EE-4DD4-8927-FB7737D8931F}"
 	ProjectSection(ProjectDependencies) = postProject
 		{63340C04-996C-46E7-9303-090627CE2B00} = {63340C04-996C-46E7-9303-090627CE2B00}
-		{2B575766-DECE-49D3-86C3-CE468805E8E0} = {2B575766-DECE-49D3-86C3-CE468805E8E0}
 	EndProjectSection
 EndProject
 Global
@@ -42,10 +34,6 @@ Global
 		{A450EC64-CD04-4389-8E10-F82CB016782E}.Debug|x64.Build.0 = Debug|x64
 		{A450EC64-CD04-4389-8E10-F82CB016782E}.Release|x64.ActiveCfg = Release|x64
 		{A450EC64-CD04-4389-8E10-F82CB016782E}.Release|x64.Build.0 = Release|x64
-		{2B575766-DECE-49D3-86C3-CE468805E8E0}.Debug|x64.ActiveCfg = Debug|x64
-		{2B575766-DECE-49D3-86C3-CE468805E8E0}.Debug|x64.Build.0 = Debug|x64
-		{2B575766-DECE-49D3-86C3-CE468805E8E0}.Release|x64.ActiveCfg = Release|x64
-		{2B575766-DECE-49D3-86C3-CE468805E8E0}.Release|x64.Build.0 = Release|x64
 		{95572FE2-0752-4CCE-A705-2111064FD89C}.Debug|x64.ActiveCfg = Debug|x64
 		{95572FE2-0752-4CCE-A705-2111064FD89C}.Debug|x64.Build.0 = Debug|x64
 		{95572FE2-0752-4CCE-A705-2111064FD89C}.Release|x64.ActiveCfg = Release|x64

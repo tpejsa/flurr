@@ -65,20 +65,23 @@
     <LibraryPath>$(GLFW)lib-vc2015;$(GLEW)lib\Release\x64;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)$(ProjectName)\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
+  <PropertyGroup>
+    <DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ExceptionHandling>false</ExceptionHandling>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\flurr\include;$(SolutionDir)..\..\flogger\include;$(SolutionDir)..\..\samples\common;$(SolutionDir)..\..\samples\$(ProjectName);$(GLM_DIR);$(GLEW_DIR)\include;$(GLFW_DIR)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\flurr\include;$(SolutionDir)..\..\samples\common;$(SolutionDir)..\..\samples\$(ProjectName);$(GLM_DIR);$(GLEW_DIR)\include;$(GLFW_DIR)\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>FLURR_DEBUG;_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <OutputFile>$(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32.lib;flurr.lib;flogger.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32.lib;flurr.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary>$(SolutionDir)..\..\lib\$(Platform)\$(ConfigurationName)\$(TargetName).lib</ImportLibrary>
       <AdditionalLibraryDirectories>$(SolutionDir)..\..\lib\$(Platform)\$(ConfigurationName)\;$(GLEW_DIR)\lib\Release\x64;$(GLFW_DIR)\lib-vc2015;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
@@ -96,7 +99,7 @@ xcopy $(SolutionDir)..\..\samples\HelloTextures\resources\*.* $(SolutionDir)..\.
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ExceptionHandling>false</ExceptionHandling>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\flurr\include;$(SolutionDir)..\..\flogger\include;$(SolutionDir)..\..\samples\common;$(SolutionDir)..\..\samples\$(ProjectName);$(GLM_DIR);$(GLEW_DIR)\include;$(GLFW_DIR)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\flurr\include;$(SolutionDir)..\..\samples\common;$(SolutionDir)..\..\samples\$(ProjectName);$(GLM_DIR);$(GLEW_DIR)\include;$(GLFW_DIR)\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -105,7 +108,7 @@ xcopy $(SolutionDir)..\..\samples\HelloTextures\resources\*.* $(SolutionDir)..\.
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <OutputFile>$(SolutionDir)..\..\bin\$(Platform)\$(ConfigurationName)\$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32.lib;flurr.lib;flogger.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32.lib;flurr.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary>$(SolutionDir)..\..\lib\$(Platform)\$(ConfigurationName)\$(TargetName).lib</ImportLibrary>
       <AdditionalLibraryDirectories>$(SolutionDir)..\..\lib\$(Platform)\$(ConfigurationName)\;$(GLEW_DIR)\lib\Release\x64;$(GLFW_DIR)\lib-vc2015;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>

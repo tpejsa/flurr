@@ -2,6 +2,8 @@
 
 #include "flurr/FlurrDefines.h"
 
+#include <GL/glew.h>
+
 #include <string>
 
 namespace flurr
@@ -27,18 +29,23 @@ public:
   Shader(Shader&&) = default;
   Shader& operator=(const Shader&) = delete;
   Shader& operator=(Shader&&) = default;
-  virtual ~Shader() = default;
+  ~Shader() = default;
 
   ShaderType getShaderType() const { return m_shaderType; }
   ShaderProgram* getOwningProgram() const { return m_owningProgram; }
 
+  GLuint getOGLShaderId() const { return m_oglShaderId; }
+
 private:
 
-  virtual Status compile(FlurrHandle a_shaderResourceHandle) = 0;
-  virtual void destroy() = 0;
+  Status compile(FlurrHandle a_shaderResourceHandle);
+  void destroy();
+
+  GLenum getOGLShaderType(ShaderType a_shaderType) const;
 
   ShaderType m_shaderType;
   ShaderProgram* m_owningProgram;
+  GLuint m_oglShaderId;
 };
 
 } // namespace flurr

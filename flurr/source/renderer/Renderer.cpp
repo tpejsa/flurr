@@ -3,16 +3,30 @@
 #include "flurr/FlurrLog.h"
 #include "flurr/utils/ConfigFile.h"
 
+#include <GL/glew.h>
+
 #include <algorithm>
 
 namespace flurr
 {
 
+void GLAPIENTRY OGLDebugMessageCallback(GLenum source,
+  GLenum type,
+  GLuint id,
+  GLenum severity,
+  GLsizei length,
+  const GLchar* message,
+  const void* userParam) {
+  FLURR_LOG_DEBUG("OGL 0x%x type = 0x%x, severity = 0x%x, message = %s",
+    source, type, severity, message);
+}
+
 Renderer::Renderer()
   : m_initialized(false),
   m_nextShaderProgramHandle(1),
+  m_nextTextureHandle(1),
   m_nextVertexBufferHandle(1),
-  m_nextVertexArrayHandle(1)
+  m_nextIndexedGeometryHandle(1)
 {
 }
 
@@ -22,7 +36,7 @@ Renderer::~Renderer()
     shutdown();
 }
 
-Status Renderer::init(const std::string& a_configPath)
+Status Renderer::init()
 {
   FLURR_LOG_INFO("Initializing flurr renderer...");
   if (isInitialized())
@@ -31,26 +45,26 @@ Status Renderer::init(const std::string& a_configPath)
     return Status::kSuccess;
   }
 
-  if (!FlurrCore::Get().isInitialized())
+  // Initialize GLEW
+  GLenum glewResult = glewInit();
+  if (GLEW_OK != glewResult)
   {
-    FLURR_LOG_ERROR("Failed to initialize flurr renderer; flurr core not initialized!");
-    return Status::kNotInitialized;
+    FLURR_LOG_ERROR("Failed to initialize GLEW (error %u)!", glewResult);
+    return Status::kFailed;
   }
 
-  // Make sure this renderer is set in FlurrCore
-  FlurrCore::Get().setRenderer(this);
+  // Register debug callback
+  glEnable(GL_DEBUG_OUTPUT);
+  glDebugMessageCallback(OGLDebugMessageCallback, 0);
 
-  // Initialize renderer
-  Status result = onInit();
-  if (Status::kSuccess != result)
-  {
-    FLURR_LOG_ERROR("Failed to initialize flurr renderer!");
-    return result;
-  }
+  // Print OpenGL capabilities
+  int numAttributes = 0;
+  glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &numAttributes);
+  FLURR_LOG_INFO("OpenGL info:\nNumber of attributes: %d", numAttributes);
 
   m_initialized = true;
   FLURR_LOG_INFO("flurr renderer initialized.");
-  return result;
+  return Status::kSuccess;
 }
 
 void Renderer::shutdown()
@@ -62,16 +76,14 @@ void Renderer::shutdown()
     return;
   }
 
-  onShutdown();
-
   // Destroy renderer resources
-  for (auto&& vertexArrayKvp : m_vertexArrays)
-    if (vertexArrayKvp.second->isArrayInitialized())
-      vertexArrayKvp.second->destroyArray();
-  m_vertexArrays.clear();
-  m_vertexArrayHandles.clear();
+  for (auto&& geometryKvp : m_indexedGeometries)
+    if (geometryKvp.second->isGeometryInitialized())
+      geometryKvp.second->destroyGeometry();
+  m_indexedGeometries.clear();
+  m_indexedGeometryHandles.clear();
   for (auto&& vertexBufferKvp : m_vertexBuffers)
-    if (vertexBufferKvp.second->getData())
+    if (vertexBufferKvp.second->isCreated())
       vertexBufferKvp.second->destroyBuffer();
   m_vertexBuffers.clear();
   m_vertexBufferHandles.clear();
@@ -94,7 +106,16 @@ Status Renderer::update(float a_deltaTime)
     return Status::kNotInitialized;
   }
 
-  return onUpdate(a_deltaTime);
+  // Clear buffers
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  return Status::kSuccess;
+}
+
+void Renderer::setViewport(int a_x, int a_y, uint32_t a_width, uint32_t a_height)
+{
+  glViewport(a_x, a_y, a_width, a_height);
 }
 
 Status Renderer::createShaderProgram(FlurrHandle& a_programHandle)
@@ -107,7 +128,7 @@ Status Renderer::createShaderProgram(FlurrHandle& a_programHandle)
 
   // Create ShaderProgram instance
   a_programHandle = GenerateHandle(m_nextShaderProgramHandle, [this](FlurrHandle a_h) { return hasShaderProgram(a_h); });
-  m_shaderPrograms.emplace(a_programHandle, std::unique_ptr<ShaderProgram>(onCreateShaderProgram(a_programHandle)));
+  m_shaderPrograms.emplace(a_programHandle, std::make_unique<ShaderProgram>(a_programHandle));
   m_shaderProgramHandles.push_back(a_programHandle);
 
   return Status::kSuccess;
@@ -219,12 +240,20 @@ Status Renderer::createTexture(FlurrHandle& a_texHandle, FlurrHandle a_texResour
 
   // Create Texture instance
   a_texHandle = GenerateHandle(m_nextTextureHandle, [this](FlurrHandle a_h) { return hasTexture(a_h); });
-  auto* texture = onCreateTexture(a_texHandle);
-  m_textures.emplace(a_texHandle, std::unique_ptr<Texture>(texture));
+  m_textures.emplace(a_texHandle, std::make_unique<Texture>(a_texHandle));
   m_textureHandles.push_back(a_texHandle);
 
   // Initialize texture with data
-  return texture->initTexture(a_texResourceHandle, a_texWrapMode, a_texMinFilterMode, a_texMagFilterMode);
+  auto result = getTexture(a_texHandle)->initTexture(a_texResourceHandle, a_texWrapMode, a_texMinFilterMode, a_texMagFilterMode);
+  if (result != Status::kSuccess)
+  {
+    // Failed to create the texture, clean up
+    m_textures.erase(a_texHandle);
+    m_textureHandles.pop_back();
+    a_texHandle = INVALID_HANDLE;
+  }
+
+  return result;
 }
 
 void Renderer::destroyTexture(FlurrHandle a_texHandle)
@@ -296,12 +325,18 @@ Status Renderer::createVertexBuffer(FlurrHandle& a_bufferHandle, VertexBufferTyp
 
   // Create VertexBuffer instance
   a_bufferHandle = GenerateHandle(m_nextVertexBufferHandle, [this](FlurrHandle a_h) { return hasVertexBuffer(a_h); });
-  auto* vertexBuffer = onCreateVertexBuffer(a_bufferHandle);
-  m_vertexBuffers.emplace(a_bufferHandle, std::unique_ptr<VertexBuffer>(vertexBuffer));
+  m_vertexBuffers.emplace(a_bufferHandle, std::make_unique<VertexBuffer>(a_bufferHandle));
   m_vertexBufferHandles.push_back(a_bufferHandle);
 
   // Initialize vertex buffer with data
-  return vertexBuffer->initBuffer(a_bufferType, a_dataSize, a_data, a_attributeSize, a_dataUsage);
+  auto result = getVertexBuffer(a_bufferHandle)->initBuffer(a_bufferType, a_dataSize, a_data, a_attributeSize, a_dataUsage);
+  if (result != Status::kSuccess)
+  {
+    // Failed to create vertex buffer, clean up
+    m_vertexBuffers.erase(a_bufferHandle);
+    m_indexedGeometryHandles.pop_back();
+    a_bufferHandle = INVALID_HANDLE;    
+  }
 }
 
 Status Renderer::createIndexBuffer(FlurrHandle& a_bufferHandle, std::size_t a_dataSize, void* a_data, VertexDataUsage a_dataUsage)
@@ -314,12 +349,11 @@ Status Renderer::createIndexBuffer(FlurrHandle& a_bufferHandle, std::size_t a_da
 
   // Create VertexBuffer instance
   a_bufferHandle = GenerateHandle(m_nextVertexBufferHandle, [this](FlurrHandle a_h) { return hasVertexBuffer(a_h); });
-  auto* vertexBuffer = onCreateVertexBuffer(a_bufferHandle);
-  m_vertexBuffers.emplace(a_bufferHandle, std::unique_ptr<VertexBuffer>(vertexBuffer));
+  m_vertexBuffers.emplace(a_bufferHandle, std::make_unique<VertexBuffer>(a_bufferHandle));
   m_vertexBufferHandles.push_back(a_bufferHandle);
 
   // Initialize index buffer with data
-  return vertexBuffer->initIndexBuffer(a_dataSize, a_data, a_dataUsage);
+  return getVertexBuffer(a_bufferHandle)->initIndexBuffer(a_dataSize, a_data, a_dataUsage);
 }
 
 void Renderer::destroyVertexBuffer(FlurrHandle a_bufferHandle)
@@ -339,7 +373,7 @@ void Renderer::destroyVertexBuffer(FlurrHandle a_bufferHandle)
   }
 
   // Destroy vertex buffer
-  if (vertexBuffer->getData())
+  if (vertexBuffer->isCreated())
     vertexBuffer->destroyBuffer();
   m_vertexBuffers.erase(a_bufferHandle);
   m_vertexBufferHandles.erase(std::remove(m_vertexBufferHandles.begin(), m_vertexBufferHandles.end(), a_bufferHandle), m_vertexBufferHandles.end());
@@ -381,7 +415,7 @@ Status Renderer::useVertexBuffer(FlurrHandle a_bufferHandle)
   return vertexBuffer->useBuffer();
 }
 
-Status Renderer::createVertexArray(FlurrHandle& a_arrayHandle, const std::vector<FlurrHandle>& a_attributeBufferHandles, FlurrHandle a_indexBufferHandle)
+Status Renderer::createIndexedGeometry(FlurrHandle& a_geometryHandle, const std::vector<FlurrHandle>& a_attributeBufferHandles, FlurrHandle a_indexBufferHandle)
 {
   if (!isInitialized())
   {
@@ -389,28 +423,26 @@ Status Renderer::createVertexArray(FlurrHandle& a_arrayHandle, const std::vector
     return Status::kNotInitialized;
   }
 
-  // Create VertexArray instance
-  a_arrayHandle = GenerateHandle(m_nextVertexArrayHandle, [this](FlurrHandle a_h) { return hasVertexArray(a_h); });
-  auto* vertexArray = onCreateVertexArray(a_arrayHandle);
-  m_vertexArrays.emplace(a_arrayHandle, std::unique_ptr<VertexArray>(vertexArray));
-  m_vertexArrayHandles.push_back(a_arrayHandle);
+  // Create IndexedGeometry instance
+  a_geometryHandle = GenerateHandle(m_nextIndexedGeometryHandle, [this](FlurrHandle a_h) { return hasIndexedGeometry(a_h); });
+  m_indexedGeometries.emplace(a_geometryHandle, std::make_unique<IndexedGeometry>(a_geometryHandle));
+  m_indexedGeometryHandles.push_back(a_geometryHandle);
 
-  // Add attribute buffers to the vertex array
-  Status result;
-  for (auto attributeBufferHandle : a_attributeBufferHandles)
+  // Initialize indexed geometry with vertex and index buffers
+  auto* geometry = getIndexedGeometry(a_geometryHandle);
+  auto result = geometry->initGeometry(a_attributeBufferHandles, a_indexBufferHandle);
+  if (result != Status::kSuccess)
   {
-    result = vertexArray->addAttributeBuffer(attributeBufferHandle);
-    if (Status::kSuccess != result)
-      return result;
+    // Failed to create the indexed geometry, clean up
+    m_indexedGeometries.erase(a_geometryHandle);
+    m_indexedGeometryHandles.pop_back();
+    a_geometryHandle = INVALID_HANDLE;
   }
-  result = vertexArray->setIndexBuffer(a_indexBufferHandle);
-  if (Status::kSuccess != result)
-    return result;
 
-  return vertexArray->initArray();
+  return result;
 }
 
-void Renderer::destroyVertexArray(FlurrHandle a_arrayHandle)
+void Renderer::destroyIndexedGeometry(FlurrHandle a_geometryHandle)
 {
   if (!isInitialized())
   {
@@ -418,39 +450,39 @@ void Renderer::destroyVertexArray(FlurrHandle a_arrayHandle)
     return;
   }
 
-  // Get VertexArray object
-  auto* vertexArray = getVertexArray(a_arrayHandle);
-  if (!vertexArray)
+  // Get IndexedGeometry object
+  auto* geometry = getIndexedGeometry(a_geometryHandle);
+  if (!geometry)
   {
-    FLURR_LOG_WARN("No VertexArray with handle %u!", a_arrayHandle);
+    FLURR_LOG_WARN("No IndexedGeometry with handle %u!", a_geometryHandle);
     return;
   }
 
-  // Destroy vertex array
-  if (vertexArray->isArrayInitialized())
-    vertexArray->destroyArray();
-  m_vertexArrays.erase(a_arrayHandle);
-  m_vertexArrayHandles.erase(std::remove(m_vertexArrayHandles.begin(), m_vertexArrayHandles.end(), a_arrayHandle), m_vertexArrayHandles.end());
+  // Destroy indexed geometry
+  if (geometry->isGeometryInitialized())
+    geometry->destroyGeometry();
+  m_indexedGeometries.erase(a_geometryHandle);
+  m_indexedGeometryHandles.erase(std::remove(m_indexedGeometryHandles.begin(), m_indexedGeometryHandles.end(), a_geometryHandle), m_indexedGeometryHandles.end());
 }
 
-bool Renderer::hasVertexArray(FlurrHandle a_arrayHandle) const
+bool Renderer::hasIndexedGeometry(FlurrHandle a_geometryHandle) const
 {
-  return m_vertexArrays.find(a_arrayHandle) != m_vertexArrays.end();
+  return m_indexedGeometries.find(a_geometryHandle) != m_indexedGeometries.end();
 }
 
-VertexArray* Renderer::getVertexArray(FlurrHandle a_arrayHandle) const
+IndexedGeometry* Renderer::getIndexedGeometry(FlurrHandle a_geometryHandle) const
 {
-  auto&& arrayIt = m_vertexArrays.find(a_arrayHandle);
-  return m_vertexArrays.end() == arrayIt ?
+  auto&& arrayIt = m_indexedGeometries.find(a_geometryHandle);
+  return m_indexedGeometries.end() == arrayIt ?
     nullptr : arrayIt->second.get();
 }
 
-VertexArray* Renderer::getVertexArrayByIndex(std::size_t a_arrayIndex) const
+IndexedGeometry* Renderer::getIndexedGeometryByIndex(std::size_t a_geometryIndex) const
 {
-  return a_arrayIndex < getVertexArrayCount() ? getVertexArray(m_vertexArrayHandles[a_arrayIndex]) : nullptr;
+  return a_geometryIndex < getIndexedGeometryCount() ? getIndexedGeometry(m_indexedGeometryHandles[a_geometryIndex]) : nullptr;
 }
 
-Status Renderer::drawVertexArray(FlurrHandle a_arrayHandle)
+Status Renderer::drawIndexedGeometry(FlurrHandle a_geometryHandle)
 {
   if (!isInitialized())
   {
@@ -458,16 +490,16 @@ Status Renderer::drawVertexArray(FlurrHandle a_arrayHandle)
     return Status::kInvalidState;
   }
 
-  // Get VertexArray object
-  auto* vertexArray = getVertexArray(a_arrayHandle);
-  if (!vertexArray)
+  // Get IndexedGeometry object
+  auto* geometry = getIndexedGeometry(a_geometryHandle);
+  if (!geometry)
   {
-    FLURR_LOG_WARN("No VertexArray with handle %u!", a_arrayHandle);
+    FLURR_LOG_WARN("No IndexedGeometry with handle %u!", a_geometryHandle);
     return Status::kInvalidArgument;
   }
 
-  // Draw vertex array
-  return vertexArray->drawArray();
+  // Draw indexed geometry
+  return geometry->drawGeometry();
 }
 
 } // namespace flurr

@@ -17,10 +17,10 @@ HelloTriangleApplication::HelloTriangleApplication(int a_windowWidth, int a_wind
   m_vb1PosHandle(INVALID_HANDLE),
   m_vb1ColorHandle(INVALID_HANDLE),
   m_ib1Handle(INVALID_HANDLE),
-  m_va1Handle(INVALID_HANDLE),
+  m_geo1Handle(INVALID_HANDLE),
   m_vb2PosHandle(INVALID_HANDLE),
   m_ib2Handle(INVALID_HANDLE),
-  m_va2Handle(INVALID_HANDLE),
+  m_geo2Handle(INVALID_HANDLE),
   m_albedoTime(0.0f)
 {
 }
@@ -91,11 +91,11 @@ bool HelloTriangleApplication::onInit()
     return false;
   }
 
-  // Create vertex array for geometry 1
-  result = renderer->createVertexArray(m_va1Handle, {m_vb1PosHandle, m_vb1ColorHandle}, m_ib1Handle);
+  // Create indexed geometry 1
+  result = renderer->createIndexedGeometry(m_geo1Handle, {m_vb1PosHandle, m_vb1ColorHandle}, m_ib1Handle);
   if (Status::kSuccess != result)
   {
-    FLURR_LOG_ERROR("Failed to create vertex array 1!");
+    FLURR_LOG_ERROR("Failed to create indexed geometry 1!");
     return false;
   }
 
@@ -159,11 +159,11 @@ bool HelloTriangleApplication::onInit()
     return false;
   }
 
-  // Create vertex array for geometry 2
-  result = renderer->createVertexArray(m_va2Handle, {m_vb2PosHandle}, m_ib2Handle);
+  // Create indexed geometry 2
+  result = renderer->createIndexedGeometry(m_geo2Handle, {m_vb2PosHandle}, m_ib2Handle);
   if (Status::kSuccess != result)
   {
-    FLURR_LOG_ERROR("Failed to create vertex array 2!");
+    FLURR_LOG_ERROR("Failed to create indexed geometry 2!");
     return false;
   }
 
@@ -190,23 +190,19 @@ bool HelloTriangleApplication::onUpdate(float a_deltaTime)
 
 void HelloTriangleApplication::onDraw()
 {
-  // Get active camera
-  auto* sceneManager = FlurrCore::Get().getSceneManager();
-  auto* activeCamera = sceneManager->getActiveCamera();
-
   // Draw geometry 1
   auto* renderer = FlurrCore::Get().getRenderer();
   renderer->useShaderProgram(m_sp1Handle);  
   auto* sp1 = renderer->getShaderProgram(m_sp1Handle);
   sp1->setMat4Value(MODEL_TRANSFORM_UNIFORM_NAME, glm::mat4());
-  activeCamera->applyShaderViewProjectionMatrix(m_sp1Handle);
-  renderer->drawVertexArray(m_va1Handle);
+  getActiveCamera()->applyShaderViewProjectionMatrix(m_sp1Handle);
+  renderer->drawIndexedGeometry(m_geo1Handle);
 
   // Draw geometry 2
   renderer->useShaderProgram(m_sp2Handle);
   auto* sp2 = renderer->getShaderProgram(m_sp2Handle);
   sp2->setMat4Value(MODEL_TRANSFORM_UNIFORM_NAME, glm::mat4());
-  activeCamera->applyShaderViewProjectionMatrix(m_sp2Handle);
+  getActiveCamera()->applyShaderViewProjectionMatrix(m_sp2Handle);
   const glm::vec4 diffuseColor(
     sin(m_albedoTime*glm::pi<float>()/2.0f)/2.0f + 0.5f,
     sin((m_albedoTime/2.0f + 0.25f)*glm::pi<float>())/2.0f + 0.5f,
@@ -214,19 +210,19 @@ void HelloTriangleApplication::onDraw()
     1.0f);
   if (!sp2->setVec4Value("diffuseColor", diffuseColor))
     FLURR_LOG_ERROR("Failed to resolve uniform diffuseColor!");
-  renderer->drawVertexArray(m_va2Handle);
+  renderer->drawIndexedGeometry(m_geo2Handle);
 }
 
 void HelloTriangleApplication::onQuit()
 {
   // Destroy geometry and shaders
   auto* renderer = FlurrCore::Get().getRenderer();
-  renderer->destroyVertexArray(m_va1Handle);
+  renderer->destroyIndexedGeometry(m_geo1Handle);
   renderer->destroyVertexBuffer(m_vb1PosHandle);
   renderer->destroyVertexBuffer(m_vb1ColorHandle);
   renderer->destroyVertexBuffer(m_ib1Handle);
   renderer->destroyShaderProgram(m_sp1Handle);
-  renderer->destroyVertexArray(m_va2Handle);
+  renderer->destroyIndexedGeometry(m_geo2Handle);
   renderer->destroyVertexBuffer(m_vb2PosHandle);
   renderer->destroyVertexBuffer(m_ib2Handle);
   renderer->destroyShaderProgram(m_sp2Handle);

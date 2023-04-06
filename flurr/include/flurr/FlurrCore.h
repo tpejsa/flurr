@@ -31,8 +31,7 @@ public:
   bool isInitialized() const { return m_initialized; }
   ResourceManager* getResourceManager() const { return m_resourceManager.get(); }
   SceneManager* getSceneManager() const { return m_sceneManager.get(); }
-  Renderer* getRenderer() const { return m_renderer; }
-  void setRenderer(Renderer* a_renderer); // called by Renderer::init
+  Renderer* getRenderer() const { return m_renderer.get(); }
 
   static FlurrCore& Get();
 
@@ -41,7 +40,7 @@ private:
   bool m_initialized;
   std::unique_ptr<ResourceManager> m_resourceManager;
   std::unique_ptr<SceneManager> m_sceneManager;
-  Renderer* m_renderer;
+  std::unique_ptr<Renderer> m_renderer;
 };
 
 } // namespace flurr

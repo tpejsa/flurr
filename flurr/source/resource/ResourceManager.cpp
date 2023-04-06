@@ -109,7 +109,7 @@ Status ResourceManager::createResource(FlurrHandle& a_resourceHandle, ResourceTy
       resource->setResourceState(ResourceState::kCreated);
       ++m_nextResourceHandle;
 
-      FLURR_LOG_DEBUG("Resource %s created successfully (resolved at %s).", a_resourcePath.c_str(), findResourceResult.fullResourcePath.c_str());
+      FLURR_LOG_DEBUG("Resource %u (%s) created successfully (resolved at %s).", resource->getResourceHandle(), a_resourcePath.c_str(), findResourceResult.fullResourcePath.c_str());
       a_resourceHandle = resource->getResourceHandle();
       return Status::kSuccess;
     }
@@ -189,7 +189,7 @@ Status ResourceManager::destroyResource(FlurrHandle a_resourceHandle)
     m_resources.erase(a_resourceHandle);
     allResourcesLock.unlock();
 
-    FLURR_LOG_DEBUG("Resource %s destroyed successfully.", resourcePath.c_str());
+    FLURR_LOG_DEBUG("Resource %u (%s) destroyed successfully.", a_resourceHandle, resourcePath.c_str());
     return Status::kSuccess;
   }
   else
@@ -210,7 +210,7 @@ Status ResourceManager::destroyAllResources()
   // Get list of resources to destroy
   std::unique_lock<std::mutex> resourceLock(m_resourceMutex);
   std::vector<FlurrHandle> resourcesToDestroy;
-  for (auto&& resourceKvp : m_resources)
+  for (const auto& resourceKvp : m_resources)
     resourcesToDestroy.push_back(resourceKvp.first);
   resourceLock.unlock();
 
@@ -436,18 +436,18 @@ ResourceOperationResult ResourceManager::executeLoadResource(FlurrHandle a_resou
 
   // Try to load resource
   std::unique_lock<std::mutex> allResourcesLock(m_resourceMutex);
-  const auto&& resourceIt = m_resources.find(a_resourceHandle);
+  auto resourceIt = m_resources.find(a_resourceHandle);
   Resource* resource = resourceIt != m_resources.end() ? resourceIt->second.get() : nullptr;
   if (resource)
   {
     if (resource->getResourceState() == ResourceState::kLoaded)
     {
-      FLURR_LOG_ERROR("Unable to load resource %s; resource already loaded or loading!", resource->getResourcePath().c_str());
+      FLURR_LOG_ERROR("Unable to load resource %u (%s); resource already loaded or loading!", a_resourceHandle, resource->getResourcePath().c_str());
       operationResult.status = Status::kResourceAlreadyLoaded;
     }
     else if (resource->getResourceState() == ResourceState::kDestroying)
     {
-      FLURR_LOG_ERROR("Unable to load resource %s; resource being destroyed!", resource->getResourcePath().c_str());
+      FLURR_LOG_ERROR("Unable to load resource %u (%s); resource being destroyed!", a_resourceHandle, resource->getResourcePath().c_str());
       operationResult.status = Status::kResourceDestroying;
     }
     else
@@ -455,17 +455,23 @@ ResourceOperationResult ResourceManager::executeLoadResource(FlurrHandle a_resou
       // Load the resource
       resource->setResourceState(ResourceState::kLoading);
       allResourcesLock.unlock(); // this is OK, resource can't get destroyed while locked
-      auto&& resourceFullPath = resource->getResourceFullPath();
+      auto resourceFullPath = resource->getResourceFullPath();
       operationResult.status = resource->onLoad(resourceFullPath);
       if (operationResult.status == Status::kSuccess)
+      {
         resource->setResourceState(ResourceState::kLoaded);
+        FLURR_LOG_DEBUG("Resource %u (%s) loaded successfully.", a_resourceHandle, resource->getResourcePath().c_str());
+      }
       else
+      {
         resource->setResourceState(ResourceState::kCreated);
+        FLURR_LOG_DEBUG("Failed to load resource %u (%s)!", a_resourceHandle, resource->getResourcePath().c_str());
+      }
     }
   }
   else
   {
-    FLURR_LOG_ERROR("Unable to load resource %s; resource does not exist!", resource->getResourcePath().c_str());
+    FLURR_LOG_ERROR("Unable to load resource %u; resource does not exist!", a_resourceHandle);
     allResourcesLock.unlock();
     operationResult.status = Status::kResourceNotCreated;
   }
@@ -490,12 +496,12 @@ ResourceOperationResult ResourceManager::executeUnloadResource(FlurrHandle a_res
   {
     if (resource->getResourceState() == ResourceState::kCreated)
     {
-      FLURR_LOG_ERROR("Unable to unload resource %s; resource not loaded!", resource->getResourcePath().c_str());
+      FLURR_LOG_ERROR("Unable to unload resource %u (%s); resource not loaded!", a_resourceHandle, resource->getResourcePath().c_str());
       operationResult.status = Status::kResourceNotLoaded;
     }
     else if (resource->getResourceState() == ResourceState::kDestroying)
     {
-      FLURR_LOG_ERROR("Unable to unload resource %s; resource being destroyed!", resource->getResourcePath().c_str());
+      FLURR_LOG_ERROR("Unable to unload resource %u (%s); resource being destroyed!", a_resourceHandle, resource->getResourcePath().c_str());
       operationResult.status = Status::kResourceDestroying;
     }
     else
@@ -506,6 +512,7 @@ ResourceOperationResult ResourceManager::executeUnloadResource(FlurrHandle a_res
       resource->setResourceState(ResourceState::kCreated);
       allResourcesLock.unlock();
       operationResult.status = Status::kSuccess;
+      FLURR_LOG_DEBUG("Resource %u (%s) unloaded successfully.", a_resourceHandle, resource->getResourcePath().c_str());
     }
   }
   else

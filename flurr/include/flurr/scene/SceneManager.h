@@ -43,7 +43,7 @@ public:
   SceneManager(SceneManager&&) = delete;
   SceneManager& operator=(const SceneManager&) = delete;
   SceneManager& operator=(SceneManager&&) = delete;
-  virtual ~SceneManager();
+  ~SceneManager();
 
   bool isInitialized() const { return m_initialized; }
   Status init();

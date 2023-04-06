@@ -1,6 +1,5 @@
 #pragma once
 #include <flurr.h>
-#include <flogger.h>
 #include <GLFW/glfw3.h>
 
 #include <string>
@@ -32,6 +31,7 @@ public:
   SceneManager* getSceneManager() const { return FlurrCore::Get().getSceneManager(); }
   Node* getCameraNode() const { return getSceneManager()->getNode(m_camNodeHandle); }
   CameraComponent* getCamera() const { return static_cast<CameraComponent*>(getSceneManager()->getComponent(m_camHandle)); }
+  CameraComponent* getActiveCamera() const { return FlurrCore::Get().getSceneManager()->getActiveCamera(); }
   void updateCameraTransform();
 
 private:

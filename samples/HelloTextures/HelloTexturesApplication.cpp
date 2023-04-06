@@ -16,11 +16,11 @@ HelloTexturesApplication::HelloTexturesApplication(int a_windowWidth, int a_wind
   m_vb1PosHandle(INVALID_HANDLE),
   m_vb1UV0Handle(INVALID_HANDLE),
   m_ib1Handle(INVALID_HANDLE),
-  m_va1Handle(INVALID_HANDLE),
+  m_geo1Handle(INVALID_HANDLE),
   m_vb2PosHandle(INVALID_HANDLE),
   m_vb2UV0Handle(INVALID_HANDLE),
   m_ib2Handle(INVALID_HANDLE),
-  m_va2Handle(INVALID_HANDLE)
+  m_geo2Handle(INVALID_HANDLE)
 {
 }
 
@@ -124,11 +124,11 @@ bool HelloTexturesApplication::onInit()
     return false;
   }
 
-  // Create vertex array for geometry 1
-  result = renderer->createVertexArray(m_va1Handle, {m_vb1PosHandle, m_vb1UV0Handle}, m_ib1Handle);
+  // Create indexed geometry for geometry 1
+  result = renderer->createIndexedGeometry(m_geo1Handle, {m_vb1PosHandle, m_vb1UV0Handle}, m_ib1Handle);
   if (Status::kSuccess != result)
   {
-    FLURR_LOG_ERROR("Failed to create vertex array 1!");
+    FLURR_LOG_ERROR("Failed to create indexed geometry 1!");
     return false;
   }
 
@@ -154,21 +154,22 @@ bool HelloTexturesApplication::onInit()
     return false;
   }
 
-  // Create vertex array for geometry 2
-  result = renderer->createVertexArray(m_va2Handle, {m_vb2PosHandle, m_vb2UV0Handle}, m_ib2Handle);
+  // Create indexed geometry for geometry 2
+  result = renderer->createIndexedGeometry(m_geo2Handle, {m_vb2PosHandle, m_vb2UV0Handle}, m_ib2Handle);
   if (Status::kSuccess != result)
   {
-    FLURR_LOG_ERROR("Failed to create vertex array 2!");
+    FLURR_LOG_ERROR("Failed to create indexed geometry 2!");
     return false;
   }
 
   // Safe to unload resources now that everything has been created
   resourceManager->unloadResource(m_vsResourceHandle);
   resourceManager->unloadResource(m_fsResourceHandle);
-  resourceManager->unloadResource(m_tex1Handle);
-  resourceManager->unloadResource(m_tex2Handle);
+  resourceManager->unloadResource(m_tex1ResourceHandle);
+  resourceManager->unloadResource(m_tex2ResourceHandle);
 
   // Set diffuse map sampler
+  renderer->useShaderProgram(m_spHandle);
   auto* sp = renderer->getShaderProgram(m_spHandle);
   if (!sp->setIntValue("diffuseMap", 0))
     FLURR_LOG_ERROR("Failed to resolve uniform diffuseMap!");
@@ -186,23 +187,26 @@ void HelloTexturesApplication::onDraw()
   // Draw geometry 1
   auto* renderer = FlurrCore::Get().getRenderer();
   renderer->useShaderProgram(m_spHandle);
+  auto* sp = renderer->getShaderProgram(m_spHandle);
+  sp->setMat4Value(MODEL_TRANSFORM_UNIFORM_NAME, glm::mat4());
+  getActiveCamera()->applyShaderViewProjectionMatrix(m_spHandle);
   renderer->useTexture(m_tex1Handle);
-  renderer->drawVertexArray(m_va1Handle);
+  renderer->drawIndexedGeometry(m_geo1Handle);
 
   // Draw geometry 2
   renderer->useTexture(m_tex2Handle);
-  renderer->drawVertexArray(m_va2Handle);
+  renderer->drawIndexedGeometry(m_geo2Handle);
 }
 
 void HelloTexturesApplication::onQuit()
 {
   // Destroy geometry and shaders
   auto* renderer = FlurrCore::Get().getRenderer();
-  renderer->destroyVertexArray(m_va1Handle);
+  renderer->destroyIndexedGeometry(m_geo1Handle);
   renderer->destroyVertexBuffer(m_vb1PosHandle);
   renderer->destroyVertexBuffer(m_vb1UV0Handle);
   renderer->destroyVertexBuffer(m_ib1Handle);
-  renderer->destroyVertexArray(m_va2Handle);
+  renderer->destroyIndexedGeometry(m_geo2Handle);
   renderer->destroyVertexBuffer(m_vb2PosHandle);
   renderer->destroyVertexBuffer(m_vb2UV0Handle);
   renderer->destroyVertexBuffer(m_ib2Handle);

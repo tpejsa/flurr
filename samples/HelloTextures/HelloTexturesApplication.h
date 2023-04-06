@@ -75,13 +75,13 @@ private:
   FlurrHandle m_vb1PosHandle;
   FlurrHandle m_vb1UV0Handle;
   FlurrHandle m_ib1Handle;
-  FlurrHandle m_va1Handle;
+  FlurrHandle m_geo1Handle;
 
   // Geometry 2
   FlurrHandle m_vb2PosHandle;
   FlurrHandle m_vb2UV0Handle;
   FlurrHandle m_ib2Handle;
-  FlurrHandle m_va2Handle;
+  FlurrHandle m_geo2Handle;
 };
 
 } // namespace flurr
